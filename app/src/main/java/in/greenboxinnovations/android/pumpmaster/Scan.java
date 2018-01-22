@@ -38,7 +38,7 @@ public class Scan extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        cameraView = (SurfaceView) findViewById(R.id.cameraView);
+        cameraView = findViewById(R.id.cameraView);
         cameraView.setZOrderMediaOverlay(true);
         holder = cameraView.getHolder();
         barcode = new BarcodeDetector.Builder(this)
@@ -91,7 +91,6 @@ public class Scan extends AppCompatActivity {
                     Intent intent = new Intent();
                     intent.putExtra("barcode", barcodes.valueAt(0));
                     setResult(RESULT_OK, intent);
-
                     finish();
                 }
             }

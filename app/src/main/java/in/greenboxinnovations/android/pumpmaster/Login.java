@@ -77,7 +77,7 @@ public class Login extends AppCompatActivity {
                         .putString("user_name","akshay")
                         .apply();
 
-                        Intent i = new Intent(getApplicationContext(), TestActivity.class);
+                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(i);
                         finish();
 //                Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
