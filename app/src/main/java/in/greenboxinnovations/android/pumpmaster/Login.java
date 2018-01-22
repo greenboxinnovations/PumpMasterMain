@@ -110,7 +110,7 @@ public class Login extends AppCompatActivity {
             if (telephonyManager != null) {
                 imei = telephonyManager.getDeviceId();
             }
-//            Log.e("login", imei);
+            Log.e("login", imei);
         }
     }
 
