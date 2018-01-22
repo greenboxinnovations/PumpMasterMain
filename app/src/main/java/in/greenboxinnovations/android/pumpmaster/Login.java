@@ -70,7 +70,16 @@ public class Login extends AppCompatActivity {
                 if (vibe != null) {
                     vibe.vibrate(50);
                 }
-                logUser();
+//                logUser();
+                sharedPrefs.edit()
+                        .putInt("user_id",1)
+                        .putInt("pump_id",1)
+                        .putString("user_name","akshay")
+                        .apply();
+
+                        Intent i = new Intent(getApplicationContext(), TestActivity.class);
+                        startActivity(i);
+                        finish();
 //                Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
             }
         });
