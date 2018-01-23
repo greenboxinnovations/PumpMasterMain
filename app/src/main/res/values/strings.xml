@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">PumpMaster</string>
+    <string name="app_name">Pump Master</string>
+    <string name="url_main">http://192.168.1.110/pump_master</string>
     <string name="url_base">http://192.168.1.110/pump_master/api</string>
     <string name="url_app">http://192.168.1.110/pump_master/app/download.php?app_name=operator</string>
     <string name="url_login">http://192.168.1.110/pump_master/exe/login_and.php</string>
@@ -9,6 +10,5 @@
     <!--<string name="url_login">http://fuelmaster.greenboxinnovations.in/exe/login_and.php</string>-->
     <!--<string name="url_check_version">http://fuelmaster.greenboxinnovations.in/exe/check_version.php</string>-->
     <string name="app_version">1</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_set_rates">Set Rates</string>
+
 </resources>
