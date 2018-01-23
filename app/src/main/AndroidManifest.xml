@@ -25,10 +25,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestActivity" />
+        <activity android:name=".Scan" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
