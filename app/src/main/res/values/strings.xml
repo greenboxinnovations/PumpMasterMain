@@ -10,4 +10,5 @@
     <!--<string name="url_check_version">http://fuelmaster.greenboxinnovations.in/exe/check_version.php</string>-->
     <string name="app_version">1</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_set_rates">Set Rates</string>
 </resources>

@@ -28,6 +28,10 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SetRates"
+            android:label="@string/title_activity_set_rates"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

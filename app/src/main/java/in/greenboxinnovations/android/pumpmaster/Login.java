@@ -72,14 +72,15 @@ public class Login extends AppCompatActivity {
                 }
 //                logUser();
                 sharedPrefs.edit()
-                        .putInt("user_id",1)
-                        .putInt("pump_id",1)
-                        .putString("user_name","akshay")
+                        .putInt("user_id", 1)
+                        .putInt("pump_id", 1)
+                        .putString("user_name", "akshay")
                         .apply();
 
-                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(i);
-                        finish();
+                //Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                Intent i = new Intent(getApplicationContext(), SetRates.class);
+                startActivity(i);
+                finish();
 //                Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -182,9 +183,9 @@ public class Login extends AppCompatActivity {
                                     Log.e("result", "success");
                                     Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
                                     sharedPrefs.edit()
-                                            .putInt("user_id",response.getInt("user_id"))
-                                            .putInt("pump_id",response.getInt("pump_id"))
-                                            .putString("user_name",response.getString("user_name"))
+                                            .putInt("user_id", response.getInt("user_id"))
+                                            .putInt("pump_id", response.getInt("pump_id"))
+                                            .putString("user_name", response.getString("user_name"))
                                             .apply();
 
 //                                    Intent i = new Intent(getApplicationContext(), Splash.class);
@@ -194,8 +195,8 @@ public class Login extends AppCompatActivity {
                                     Log.e("result", "fail");
                                     Snackbar.make(coordinatorLayout, "Access Denied Or Wrong User", Snackbar.LENGTH_SHORT).show();
                                     sharedPrefs.edit()
-                                            .putInt("user_id",-1)
-                                            .putInt("pump_id",-1)
+                                            .putInt("user_id", -1)
+                                            .putInt("pump_id", -1)
                                             .apply();
                                 }
                             } catch (JSONException e) {
@@ -254,7 +255,7 @@ public class Login extends AppCompatActivity {
         int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
         //If permission is granted returning true
-        if (result == PackageManager.PERMISSION_GRANTED){
+        if (result == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
 
