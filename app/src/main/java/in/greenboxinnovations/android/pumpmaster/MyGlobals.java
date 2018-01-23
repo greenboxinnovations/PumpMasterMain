@@ -18,9 +18,9 @@ public class MyGlobals{
 
     public boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null;
-
     }
 
     public boolean isWiFiEnabled() {
