@@ -112,6 +112,12 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.enterReceipt) {
             showDialog();
         }
+        if (item.getItemId() == R.id.logout) {
+            sharedPrefs.edit().clear().apply();
+            Intent i = new Intent(getApplicationContext(), Login.class);
+            startActivity(i);
+            finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 
