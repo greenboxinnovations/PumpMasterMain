@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
-    private TextView petrol_rate,diesel_rate,user_name;
+    private TextView petrol_rate,diesel_rate,user_name,pump_name,petrol_title,diesel_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +75,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
+
+        petrol_title = findViewById(R.id.tv_petrol_rate_title);
+        diesel_title = findViewById(R.id.tv_diesel_rate_title);
+        pump_name = findViewById(R.id.tv_pump_name);
+
         petrol_rate = findViewById(R.id.tv_petrol_rate);
         diesel_rate = findViewById(R.id.tv_diesel_rate);
         user_name   = findViewById(R.id.tv_user_name);
+
 
         petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate","00.00")));
         diesel_rate.setText(String.valueOf(sharedPrefs.getString("diesel_rate","00.00")));
@@ -154,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
             url = url+"/exe/check_qr.php";
 
-//                    Log.e("login response", url);
+            Log.e("login response", url);
 
             JSONObject jsonObj = new JSONObject();
             try {
@@ -182,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     Intent i = new Intent(getApplicationContext(), NewTransaction.class);
                                     startActivity(i);
-                                    finish();
+//                                    finish();
                             } else {
                                 Log.e("result", "fail");
                                 Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();

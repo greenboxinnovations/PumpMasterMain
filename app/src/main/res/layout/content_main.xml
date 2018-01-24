@@ -15,11 +15,11 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:text="User Name Here"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.016"
-        tools:text="User Name Here" />
+        app:layout_constraintVertical_bias="0.016" />
 
     <TextView
         android:id="@+id/tv_petrol_rate_title"
@@ -28,11 +28,11 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:text="Petrol Rate"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144"
-        tools:text="Petrol Rate" />
+        app:layout_constraintVertical_bias="0.144" />
 
     <TextView
         android:id="@+id/tv_diesel_rate_title"
@@ -41,11 +41,11 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:text="Diesel Rate"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.273"
-        tools:text="Diesel Rate" />
+        app:layout_constraintVertical_bias="0.273" />
 
     <TextView
         android:id="@+id/tv_petrol_rate"
@@ -80,10 +80,10 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:text="Select Automobiles"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.016"
-        tools:text="Select Automobiles" />
+        app:layout_constraintVertical_bias="0.016" />
 
 </android.support.constraint.ConstraintLayout>
