@@ -1,7 +1,9 @@
 package in.greenboxinnovations.android.pumpmaster;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -39,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     MyGlobals myGlobals;
     boolean isWiFiEnabled;
     CoordinatorLayout coordinatorLayout;
+    private static final String APP_SHARED_PREFS = "prefs";
+    private SharedPreferences sharedPrefs;
+    private TextView petrol_rate,diesel_rate,user_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
         isWiFiEnabled = myGlobals.isWiFiEnabled();
 
         coordinatorLayout = findViewById(R.id.activity_main_layout);
+        sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        init();
+
+
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -62,10 +74,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void init(){
+        petrol_rate = findViewById(R.id.tv_petrol_rate);
+        diesel_rate = findViewById(R.id.tv_diesel_rate);
+        user_name   = findViewById(R.id.tv_user_name);
+
+        petrol_rate.setText(String.valueOf(sharedPrefs.getInt("petrol_rate",-1)));
+        diesel_rate.setText(String.valueOf(sharedPrefs.getInt("diesel_rate",-1)));
+        user_name.setText(sharedPrefs.getString("user_name","error"));
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100 && resultCode == RESULT_OK) {
-            if (data != null) {
+             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
                 Log.e("code", "" + val);

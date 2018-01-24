@@ -74,6 +74,8 @@ public class Login extends AppCompatActivity {
                 sharedPrefs.edit()
                         .putInt("user_id", 1)
                         .putInt("pump_id", 1)
+                        .putString("petrol_rate", "75.25")
+                        .putString("diesel_rate", "64.20")
                         .putString("user_name", "akshay")
                         .apply();
 
