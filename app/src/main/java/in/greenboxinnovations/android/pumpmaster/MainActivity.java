@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         diesel_rate = findViewById(R.id.tv_diesel_rate);
         user_name   = findViewById(R.id.tv_user_name);
 
-        petrol_rate.setText(String.valueOf(sharedPrefs.getInt("petrol_rate",-1)));
-        diesel_rate.setText(String.valueOf(sharedPrefs.getInt("diesel_rate",-1)));
+        petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate","00.00")));
+        diesel_rate.setText(String.valueOf(sharedPrefs.getString("diesel_rate","00.00")));
         user_name.setText(sharedPrefs.getString("user_name","error"));
     }
 
