@@ -174,9 +174,9 @@ public class MainActivity extends AppCompatActivity {
 //                                                    .putString("user_name",response.getString("user_name"))
 //                                                    .apply();
 
-//                                    Intent i = new Intent(getApplicationContext(), Splash.class);
-//                                    startActivity(i);
-//                                    finish();
+                                    Intent i = new Intent(getApplicationContext(), NewTransaction.class);
+                                    startActivity(i);
+                                    finish();
                             } else {
                                 Log.e("result", "fail");
                                 Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
