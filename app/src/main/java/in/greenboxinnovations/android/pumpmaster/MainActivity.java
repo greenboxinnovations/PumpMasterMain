@@ -109,9 +109,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.enterReceipt) {
-            showDialog();
-        }
+//        if (item.getItemId() == R.id.enterReceipt) {
+//            showDialog();
+//        }
         if (item.getItemId() == R.id.logout) {
             sharedPrefs.edit().clear().apply();
             Intent i = new Intent(getApplicationContext(), Login.class);
