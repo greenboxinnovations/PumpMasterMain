@@ -27,6 +27,7 @@ public class NewTransaction extends AppCompatActivity {
     private boolean isPetrol = true;
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
+    private String qr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +60,14 @@ public class NewTransaction extends AppCompatActivity {
         et_fuel_litres = findViewById(R.id.et_lit);
         et_fuel_rs = findViewById(R.id.et_rs);
         b_new_transaction = findViewById(R.id.b_new_transaction);
+        qr = getIntent().getStringExtra("qr");
+
     }
 
 
     private void newTransaction() {
+
+        Log.e("qr",qr);
 
         // hide keyboard on submit
         View view = this.getCurrentFocus();

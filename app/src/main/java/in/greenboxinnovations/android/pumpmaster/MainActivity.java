@@ -61,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         init();
 
-
-
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //local network check
-    private void isCodeValid(String val){
+    private void isCodeValid(final String val){
         if (isWiFiEnabled){
 
             String url = getResources().getString(R.string.url_main);
@@ -187,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
 //                                                    .apply();
 
                                     Intent i = new Intent(getApplicationContext(), NewTransaction.class);
+                                    i.putExtra("qr",val);
                                     startActivity(i);
 //                                    finish();
                             } else {
