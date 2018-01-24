@@ -23,7 +23,7 @@ public class NewTransaction extends AppCompatActivity {
     private double d_rate = 20;
     private TextView fuel_type, fuel_rate;
     private EditText et_fuel_litres, et_fuel_rs;
-    private Button b_new_transaction;
+    private FloatingActionButton b_new_transaction;
     private boolean isPetrol = true;
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
