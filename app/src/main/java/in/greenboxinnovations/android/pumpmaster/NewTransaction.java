@@ -17,6 +17,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class NewTransaction extends AppCompatActivity {
 
     private double p_rate = 10;
@@ -37,6 +40,15 @@ public class NewTransaction extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         init();
+
+
+        try {
+            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("jsonObject"));
+            Log.e("tag", jsonObj.getString("cust_name"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         et_fuel_litres.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(7, 2)});
         et_fuel_rs.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(6, 2)});
 
@@ -61,13 +73,12 @@ public class NewTransaction extends AppCompatActivity {
         et_fuel_rs = findViewById(R.id.et_rs);
         b_new_transaction = findViewById(R.id.b_new_transaction);
         qr = getIntent().getStringExtra("qr");
-
     }
 
 
     private void newTransaction() {
 
-        Log.e("qr",qr);
+        Log.e("qr", qr);
 
         // hide keyboard on submit
         View view = this.getCurrentFocus();

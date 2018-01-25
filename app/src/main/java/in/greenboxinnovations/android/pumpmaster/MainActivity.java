@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
-    private TextView petrol_rate,diesel_rate,user_name,pump_name,petrol_title,diesel_title;
+    private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void init(){
+    private void init() {
 
         petrol_title = findViewById(R.id.tv_petrol_rate_title);
         diesel_title = findViewById(R.id.tv_diesel_rate_title);
@@ -79,18 +79,18 @@ public class MainActivity extends AppCompatActivity {
 
         petrol_rate = findViewById(R.id.tv_petrol_rate);
         diesel_rate = findViewById(R.id.tv_diesel_rate);
-        user_name   = findViewById(R.id.tv_user_name);
+        user_name = findViewById(R.id.tv_user_name);
 
 
-        petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate","00.00")));
-        diesel_rate.setText(String.valueOf(sharedPrefs.getString("diesel_rate","00.00")));
-        user_name.setText(sharedPrefs.getString("user_name","error"));
+        petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate", "00.00")));
+        diesel_rate.setText(String.valueOf(sharedPrefs.getString("diesel_rate", "00.00")));
+        user_name.setText(sharedPrefs.getString("user_name", "error"));
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100 && resultCode == RESULT_OK) {
-             if (data != null) {
+            if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
                 Log.e("code", "" + val);
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showDialog(){
+    private void showDialog() {
         final EditText input = new EditText(this);
 
         input.setWidth(60);
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String val = String.valueOf(input.getText());
-                        Log.e("receipt no entered",val);
+                        Log.e("receipt no entered", val);
                     }
                 })
                 .setNegativeButton("Cancel", null)
@@ -150,12 +150,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //local network check
-    private void isCodeValid(final String val){
-        if (isWiFiEnabled){
+    private void isCodeValid(final String val) {
+        if (isWiFiEnabled) {
 
             String url = getResources().getString(R.string.url_main);
 
-            url = url+"/exe/check_qr.php";
+            url = url + "/exe/check_qr.php";
 
             Log.e("login response", url);
 
@@ -167,16 +167,16 @@ public class MainActivity extends AppCompatActivity {
             }
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                url, jsonObj,
-                new Response.Listener<JSONObject>() {
+                    url, jsonObj,
+                    new Response.Listener<JSONObject>() {
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-//                                    Log.e("login response", response.toString());
-                        try {
-                            if (response.getBoolean("success")) {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("login response", response.toString());
+                            try {
+                                if (response.getBoolean("success")) {
 //                                            Log.e("result", "success");
-                                Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
 //                                            sharedPrefs.edit()
 //                                                    .putInt("user_id",response.getInt("user_id"))
 //                                                    .putInt("pump_id",response.getInt("pump_id"))
@@ -184,18 +184,18 @@ public class MainActivity extends AppCompatActivity {
 //                                                    .apply();
 
                                     Intent i = new Intent(getApplicationContext(), NewTransaction.class);
-                                    i.putExtra("qr",val);
+                                    i.putExtra("jsonObject", response.toString());
                                     startActivity(i);
 //                                    finish();
-                            } else {
-                                Log.e("result", "fail");
-                                Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
+                                } else {
+                                    Log.e("result", "fail");
+                                    Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                }, new Response.ErrorListener() {
+                    }, new Response.ErrorListener() {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -216,7 +216,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
 
 
 }
