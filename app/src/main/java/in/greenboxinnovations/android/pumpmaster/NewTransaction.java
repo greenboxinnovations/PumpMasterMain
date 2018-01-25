@@ -1,6 +1,7 @@
 package in.greenboxinnovations.android.pumpmaster;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -27,10 +29,10 @@ public class NewTransaction extends AppCompatActivity {
     private TextView fuel_type, fuel_rate;
     private EditText et_fuel_litres, et_fuel_rs;
     private FloatingActionButton b_new_transaction;
-    private boolean isPetrol = true;
+    private boolean isPetrol = false;
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
-    private String qr;
+    private RelativeLayout rl_back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +47,17 @@ public class NewTransaction extends AppCompatActivity {
         try {
             JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("jsonObject"));
             Log.e("tag", jsonObj.getString("cust_name"));
+            isPetrol = jsonObj.getBoolean("isPetrol");
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        if (isPetrol){
+            rl_back.setBackgroundColor(Color.parseColor("#0D9F56"));
+
+        }else{
+            rl_back.setBackgroundColor(Color.parseColor("#00AAE8"));
+            fuel_type.setText("Diesel");
         }
 
         et_fuel_litres.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(7, 2)});
@@ -72,13 +83,11 @@ public class NewTransaction extends AppCompatActivity {
         et_fuel_litres = findViewById(R.id.et_lit);
         et_fuel_rs = findViewById(R.id.et_rs);
         b_new_transaction = findViewById(R.id.b_new_transaction);
-        qr = getIntent().getStringExtra("qr");
+        rl_back = findViewById(R.id.rl_back);
     }
 
 
     private void newTransaction() {
-
-        Log.e("qr", qr);
 
         // hide keyboard on submit
         View view = this.getCurrentFocus();
