@@ -162,7 +162,9 @@ public class Login extends AppCompatActivity {
     private void logUser() {
 
 
-        String url = getResources().getString(R.string.url_login);
+        String url = getResources().getString(R.string.url_main);
+
+        url = url+"/exe/login_and.php";
 
         String name = userName.getText().toString();
         final String pass = password.getText().toString();

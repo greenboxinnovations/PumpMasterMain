@@ -20,6 +20,7 @@
         <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -38,10 +39,10 @@
             android:label="@string/title_activity_new_transaction"
             android:theme="@style/AppTheme.NoActionBar" />
 
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
         <provider
             android:name=".GenericFileProvider"
             android:authorities="in.greenboxinnovations.android.pumpmaster.provider"
@@ -49,8 +50,13 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
+
+        <service
+            android:name=".UploadService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
