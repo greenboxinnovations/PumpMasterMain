@@ -18,7 +18,7 @@ public class HttpFileUpload extends AsyncTask<String, Integer, String> {
 
     private URL connectURL;
     private File file;
-    private boolean fileSuccess = true;
+    private boolean fileSuccess = false;
     private AysncInterface listener;
 
 
@@ -99,7 +99,7 @@ public class HttpFileUpload extends AsyncTask<String, Integer, String> {
             if (fileInputStream != null) {
                 bytesAvailable = fileInputStream.available();
                 Log.e("bytesAvailable", "" + bytesAvailable);
-                int maxBufferSize = 1024;
+                int maxBufferSize = 10240;
                 int bufferSize = Math.min(bytesAvailable, maxBufferSize);
                 Log.e("bufferSize", "" + bufferSize);
                 byte[] buffer = new byte[bufferSize];
@@ -149,6 +149,10 @@ public class HttpFileUpload extends AsyncTask<String, Integer, String> {
             dos.close();
             if (s.equals("true")) {
                 fileSuccess = true;
+            }else{
+                Log.e("Response", "error");
+                fileSuccess = false;
+                listener.asyncError();
             }
 
 
