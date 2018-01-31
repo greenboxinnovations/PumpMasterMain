@@ -37,7 +37,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Login extends AppCompatActivity {
@@ -74,18 +77,8 @@ public class Login extends AppCompatActivity {
                 if (vibe != null) {
                     vibe.vibrate(50);
                 }
-//                logUser();
-                sharedPrefs.edit()
-                        .putInt("user_id", 1)
-                        .putInt("pump_id", 1)
-                        .putString("petrol_rate", "75.25")
-                        .putString("diesel_rate", "64.20")
-                        .putString("user_name", "akshay")
-                        .apply();
+                logUser();
 
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(i);
-                finish();
 //                Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -166,6 +159,10 @@ public class Login extends AppCompatActivity {
 
         url = url+"/exe/login_and.php";
 
+        Date cDate = new Date();
+        final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
+        Log.e("date",date);
+
         String name = userName.getText().toString();
         final String pass = password.getText().toString();
         if ((userName.getText().length() == 0) || (password.getText().length() == 0)) {
@@ -202,16 +199,22 @@ public class Login extends AppCompatActivity {
                             try {
                                 if (response.getBoolean("success")) {
                                     Log.e("result", "success");
-                                    Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
-                                    sharedPrefs.edit()
-                                            .putInt("user_id", response.getInt("user_id"))
-                                            .putInt("pump_id", response.getInt("pump_id"))
-                                            .putString("user_name", response.getString("user_name"))
-                                            .apply();
+                                    if (response.getString("date").equals(date)) {
+                                        Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
+                                        sharedPrefs.edit()
+                                                .putString("date", date)
+                                                .putInt("user_id", response.getInt("user_id"))
+                                                .putInt("pump_id", response.getInt("pump_id"))
+//                                                .putString("petrol_rate", response.getString("petrol_rate"))
+//                                                .putString("diesel_rate", response.getString("diesel_rate"))
+                                                .putString("user_name", response.getString("user_name"))
+                                                .apply();
 
-//                                    Intent i = new Intent(getApplicationContext(), Splash.class);
-//                                    startActivity(i);
-//                                    finish();
+                                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+
                                 } else {
                                     Log.e("result", "fail");
                                     Snackbar.make(coordinatorLayout, "Access Denied Or Wrong User", Snackbar.LENGTH_SHORT).show();

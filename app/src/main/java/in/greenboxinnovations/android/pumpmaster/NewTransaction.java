@@ -41,7 +41,7 @@ public class NewTransaction extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
-    private File outputFile;
+    private int car_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,7 @@ public class NewTransaction extends AppCompatActivity {
             JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("jsonObject"));
             Log.e("tag", jsonObj.getString("cust_name"));
             isPetrol = jsonObj.getBoolean("isPetrol");
+            car_id   = jsonObj.getInt("car_id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -100,15 +101,15 @@ public class NewTransaction extends AppCompatActivity {
         // this.current_photo = type;
 
         File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/pump_master");
+        String type = "pump";
+        String filename = car_id+"_"+type+".png";
+        File outputFile = new File(dir, filename);
 
-
-        outputFile = new File(dir, "check.png");
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), "in.greenboxinnovations.android.pumpmaster.provider", outputFile);
 
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(outputFile));
         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(intent, 100);
