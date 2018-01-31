@@ -1,8 +1,12 @@
 package in.greenboxinnovations.android.pumpmaster;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,6 +26,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 public class NewTransaction extends AppCompatActivity {
 
     private double p_rate = 10;
@@ -33,6 +39,7 @@ public class NewTransaction extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
+    private File outputFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,42 @@ public class NewTransaction extends AppCompatActivity {
         rl_back = findViewById(R.id.rl_back);
     }
 
+    private void clickPhoto() {
+       // this.current_photo = type;
+
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+        outputFile = new File(dir, "check.png");
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(outputFile));
+        startActivityForResult(intent, 100);
+
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case 100:
+                if (resultCode == RESULT_OK) {
+                    //sendFile(outputFile);
+                    Log.e("photo", "send");
+
+//                    confirmPhoto(current_photo);
+
+                    //check if running
+//                    if (!isMyServiceRunning(UploadService.class)) {
+//                        Intent i = new Intent(getApplication(), UploadService.class);
+//                        startService(i);
+//                    }
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the image capture
+                    Log.e("photo result", "cancelled");
+                } else {
+                    Log.e("photo result", "else");
+                }
+        }
+    }
 
     private void newTransaction() {
 
