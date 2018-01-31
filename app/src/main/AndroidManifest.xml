@@ -55,8 +55,7 @@
 
         <service
             android:name=".UploadService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:enabled="true" />
     </application>
 
 </manifest>
