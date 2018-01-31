@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -35,6 +36,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +63,8 @@ public class Login extends AppCompatActivity {
         init();
         // checkers
         networkChecker();
+
+        checkPhotoDir();
 
         // login
         login.setOnClickListener(new View.OnClickListener() {
@@ -140,6 +144,20 @@ public class Login extends AppCompatActivity {
 
         sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
     }
+
+
+    private void checkPhotoDir() {
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/pump_master");
+        Log.e("h", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString());
+        if (folder.exists()) {
+            Log.e("rag", "exists");
+        } else {
+            if (folder.mkdirs()) {
+                Log.e("rag", "pump_master dir created");
+            }
+        }
+    }
+
 
     private void logUser() {
 
@@ -266,7 +284,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, STORAGE_PERMISSION_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
     }
 
     //This method will be called when the user will tap on allow or deny

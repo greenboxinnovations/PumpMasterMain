@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -59,10 +60,10 @@ public class NewTransaction extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if (isPetrol){
+        if (isPetrol) {
             rl_back.setBackgroundColor(Color.parseColor("#0D9F56"));
 
-        }else{
+        } else {
             rl_back.setBackgroundColor(Color.parseColor("#00AAE8"));
             fuel_type.setText("Diesel");
         }
@@ -78,7 +79,8 @@ public class NewTransaction extends AppCompatActivity {
         b_new_transaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                newTransaction();
+//                newTransaction();
+                clickPhoto();
             }
         });
     }
@@ -94,14 +96,20 @@ public class NewTransaction extends AppCompatActivity {
     }
 
     private void clickPhoto() {
-       // this.current_photo = type;
+        // this.current_photo = type;
 
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/pump_master");
+
 
         outputFile = new File(dir, "check.png");
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(outputFile));
+
+        Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), "in.greenboxinnovations.android.pumpmaster.provider", outputFile);
+
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(outputFile));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(intent, 100);
 
     }
