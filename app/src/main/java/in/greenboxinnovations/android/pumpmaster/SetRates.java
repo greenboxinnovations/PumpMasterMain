@@ -1,6 +1,7 @@
 package in.greenboxinnovations.android.pumpmaster;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -60,7 +61,7 @@ public class SetRates extends AppCompatActivity {
     }
 
     private void init() {
-        url = getResources().getString(R.string.url_base) + "/transactions/rates";
+        url = getResources().getString(R.string.url_main) + "/api/transactions/rates";
         coordinatorLayout = findViewById(R.id.cl_set_rates);
         petrol_et = findViewById(R.id.et_petrol);
         diesel_et = findViewById(R.id.et_diesel);
@@ -115,17 +116,13 @@ public class SetRates extends AppCompatActivity {
 
                                 try {
                                     if (response.getBoolean("success")) {
-                                        Log.e("result", "success");
-//                                        Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
-//                                        sharedPrefs.edit()
-//                                                .putInt("user_id", response.getInt("user_id"))
-//                                                .putInt("pump_id", response.getInt("pump_id"))
-//                                                .putString("user_name", response.getString("user_name"))
-//                                                .apply();
+                                        String msg = response.getString("msg");
+                                        Snackbar.make(coordinatorLayout, msg, Snackbar.LENGTH_SHORT).show();
 
-//                                    Intent i = new Intent(getApplicationContext(), Splash.class);
-//                                    startActivity(i);
-//                                    finish();
+
+                                    Intent i = new Intent(getApplicationContext(), Login.class);
+                                    startActivity(i);
+                                    finish();
                                     } else {
                                         Log.e("result", "fail");
                                         String msg = response.getString("msg");

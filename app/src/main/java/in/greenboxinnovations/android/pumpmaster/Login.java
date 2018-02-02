@@ -3,6 +3,7 @@ package in.greenboxinnovations.android.pumpmaster;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,11 +17,15 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -58,10 +63,13 @@ public class Login extends AppCompatActivity {
     private String imei;
     private int STORAGE_PERMISSION_CODE = 101;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+
 
         init();
         // checkers
@@ -96,10 +104,11 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (sharedPrefs.getInt("user_id", -1) > 0) {
-//            Intent i = new Intent(this, Splash.class);
-//            startActivity(i);
-//            finish();
+
+        if (!sharedPrefs.getString("shift", "").equals("")) {
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+            finish();
         }
 
         if (!isReadPhoneStateAllowed()) {
@@ -151,6 +160,12 @@ public class Login extends AppCompatActivity {
         }
     }
 
+    private void redirect(){
+        Intent i = new Intent(getApplicationContext(), SetRates.class);
+        startActivity(i);
+        finish();
+    }
+
 
     private void logUser() {
 
@@ -199,20 +214,20 @@ public class Login extends AppCompatActivity {
                             try {
                                 if (response.getBoolean("success")) {
                                     Log.e("result", "success");
-                                    if (response.getString("date").equals(date)) {
+                                    if ((response.getString("date").equals(date))&&(response.getBoolean("rate_set"))) {
+
                                         Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
                                         sharedPrefs.edit()
                                                 .putString("date", date)
                                                 .putInt("user_id", response.getInt("user_id"))
                                                 .putInt("pump_id", response.getInt("pump_id"))
-//                                                .putString("petrol_rate", response.getString("petrol_rate"))
-//                                                .putString("diesel_rate", response.getString("diesel_rate"))
+                                                .putString("petrol_rate", response.getString("petrol_rate"))
+                                                .putString("diesel_rate", response.getString("diesel_rate"))
                                                 .putString("user_name", response.getString("user_name"))
                                                 .apply();
-
-                                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                                        startActivity(i);
-                                        finish();
+                                        showDialog();
+                                    }else{
+                                        redirect();
                                     }
 
                                 } else {
@@ -250,6 +265,37 @@ public class Login extends AppCompatActivity {
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
 
         }
+    }
+
+    private void showDialog() {
+        final EditText input = new EditText(this);
+
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Select Shift")
+                .setPositiveButton("Shift B", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        next("b");
+                    }
+                })
+                .setNegativeButton("Shift A", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        next("a");
+                    }
+                })
+                .create();
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        dialog.show();
+
+    }
+
+    private void next(String shift){
+        sharedPrefs.edit().putString("shift", shift).apply();
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+        finish();
     }
 
     // checkers

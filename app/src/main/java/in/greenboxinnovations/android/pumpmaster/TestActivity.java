@@ -61,7 +61,7 @@ public class TestActivity extends AppCompatActivity {
 
 
     private void pingServer() {
-        String url = getResources().getString(R.string.url_base);
+        String url = getResources().getString(R.string.url_main);
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
