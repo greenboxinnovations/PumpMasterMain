@@ -113,6 +113,8 @@ public class NewTransaction extends AppCompatActivity {
                     click = true;
                     newTransaction();
                 }
+
+
             }
         });
     }
