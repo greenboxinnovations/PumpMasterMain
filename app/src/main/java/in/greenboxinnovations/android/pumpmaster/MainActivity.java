@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
+    private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
 
     @Override
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent scan = new Intent(getApplicationContext(), Scan.class);
+                scan.putExtra("title","Scan Car");
                 startActivityForResult(scan, 100);
             }
         });
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         diesel_rate = findViewById(R.id.tv_diesel_rate);
         user_name = findViewById(R.id.tv_user_name);
 
+        jsonObject = null;
 
         petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate", "00.00")));
         diesel_rate.setText(String.valueOf(sharedPrefs.getString("diesel_rate", "00.00")));
@@ -93,12 +96,26 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
-                Log.e("code", "" + val);
-                Toast.makeText(getApplicationContext(), "Code is " + val, Toast.LENGTH_SHORT).show();
+                Log.e("Car code", "" + val);
+                Toast.makeText(getApplicationContext(), "Car Code is " + val, Toast.LENGTH_SHORT).show();
                 isCodeValid(val);
             }
         }
+        if (requestCode == 101 && resultCode == RESULT_OK) {
+            if (data != null) {
+                final Barcode barcode = data.getParcelableExtra("barcode");
+                String val = barcode.displayValue;
+                Log.e("Pump code", "" + val);
+                Toast.makeText(getApplicationContext(), "Pump Code is " + val, Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(getApplicationContext(), NewTransaction.class);
+                i.putExtra("jsonObject", jsonObject.toString());
+                i.putExtra("pumpCode", val);
+                startActivity(i);
+            }
+        }
     }
+
 
     // Ensure the right menu is setup
     @Override
@@ -175,18 +192,14 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("login response", response.toString());
                             try {
                                 if (response.getBoolean("success")) {
-//                                            Log.e("result", "success");
-                                    Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
-//                                            sharedPrefs.edit()
-//                                                    .putInt("user_id",response.getInt("user_id"))
-//                                                    .putInt("pump_id",response.getInt("pump_id"))
-//                                                    .putString("user_name",response.getString("user_name"))
-//                                                    .apply();
 
-                                    Intent i = new Intent(getApplicationContext(), NewTransaction.class);
-                                    i.putExtra("jsonObject", response.toString());
-                                    startActivity(i);
-//                                    finish();
+                                    Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
+
+                                    jsonObject = response;
+                                    Intent scan = new Intent(getApplicationContext(), Scan.class);
+                                    scan.putExtra("title","Scan Pump");
+                                    startActivityForResult(scan, 101);
+
                                 } else {
                                     Log.e("result", "fail");
                                     Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
