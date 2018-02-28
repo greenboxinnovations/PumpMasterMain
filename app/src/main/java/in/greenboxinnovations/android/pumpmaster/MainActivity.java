@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefs;
     private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
+    private int car_id,pump_code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
 
         init();
-
+        car_id = 0;
+        pump_code = 0;
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         user_name.setText(sharedPrefs.getString("user_name", "error"));
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100 && resultCode == RESULT_OK) {
@@ -105,12 +108,14 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
+                pump_code = Integer.valueOf(val);
                 Log.e("Pump code", "" + val);
+                snapZeroPhoto();
                 Toast.makeText(getApplicationContext(), "Pump Code is " + val, Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(getApplicationContext(), NewTransaction.class);
                 i.putExtra("jsonObject", jsonObject.toString());
-                i.putExtra("pumpCode", val);
+                i.putExtra("pump_code", val);
                 startActivity(i);
             }
         }
@@ -196,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                                     Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
 
                                     jsonObject = response;
+                                    car_id = response.getInt("car_id");
                                     Intent scan = new Intent(getApplicationContext(), Scan.class);
                                     scan.putExtra("title","Scan Pump");
                                     startActivityForResult(scan, 101);
@@ -227,8 +233,70 @@ public class MainActivity extends AppCompatActivity {
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
 
+        }else{
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
         }
     }
 
+    private void snapZeroPhoto(){
+        if (isWiFiEnabled){
+
+            String url = getResources().getString(R.string.url_main);
+
+            url = url + "/exe/snap_photo.php";
+
+            JSONObject jsonObj = new JSONObject();
+            try {
+                jsonObj.put("photo_type", "zero");
+                jsonObj.put("car_id", car_id);
+                jsonObj.put("pump_code",pump_code );
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObj,
+                    new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("new transaction response", response.toString());
+                            try {
+                                if (response.getBoolean("success")) {
+                                    Snackbar.make(coordinatorLayout, "Transaction Added.", Snackbar.LENGTH_SHORT).show();
+
+                                } else {
+                                    Log.e("result", "fail");
+                                    Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Volley Error", "Error: " + error.getMessage());
+                    Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("charset", "utf-8");
+                    return headers;
+                }
+            };
+            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+
+
+        }else{
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+        }
+    }
 
 }

@@ -53,7 +53,7 @@ public class NewTransaction extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
-    private int car_id,cust_id,user_id,pump_id;
+    private int car_id,cust_id,user_id,pump_id,pump_code;
     private String shift;
 
     private File outputFile;
@@ -70,6 +70,8 @@ public class NewTransaction extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         init();
+
+        pump_code = Integer.valueOf(getIntent().getStringExtra("pump_code"));
 
         p_rate = Double.valueOf(sharedPrefs.getString("petrol_rate", "-1"));
         d_rate = Double.valueOf(sharedPrefs.getString("diesel_rate", "-1"));
@@ -221,6 +223,7 @@ public class NewTransaction extends AppCompatActivity {
                 jsonObj.put("liters",fuel_lit );
                 jsonObj.put("cust_id",cust_id );
                 jsonObj.put("user_id",user_id );
+                jsonObj.put("pump_code",pump_code );
                 jsonObj.put("shift",shift );
                 jsonObj.put("fuel_rate",fuel_rate );
                 jsonObj.put("pump_id",pump_id );
@@ -228,7 +231,7 @@ public class NewTransaction extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-//            Log.e("transaction jsonObj", jsonObj.toString());
+
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     url, jsonObj,
                     new Response.Listener<JSONObject>() {
