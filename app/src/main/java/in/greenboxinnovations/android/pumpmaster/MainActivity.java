@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
 
             JSONObject jsonObj = new JSONObject();
             try {
-                jsonObj.put("photo_type", "zero");
+                jsonObj.put("photo_type", "start");
                 jsonObj.put("car_id", car_id);
                 jsonObj.put("pump_code",pump_code );
 
@@ -261,14 +261,15 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.e("new transaction response", response.toString());
+                            Log.e("new transaction resp", response.toString());
                             try {
                                 if (response.getBoolean("success")) {
-                                    Snackbar.make(coordinatorLayout, "Transaction Added.", Snackbar.LENGTH_SHORT).show();
-
+                                    //get photo url as response and display here
+                                   String photo_url =  response.getString("photo_url");
+                                    Log.e("photo_url", photo_url);
                                 } else {
-                                    Log.e("result", "fail");
-                                    Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
+
+                                    Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -292,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
-
 
         }else{
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();

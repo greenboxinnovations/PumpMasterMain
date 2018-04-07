@@ -49,7 +49,7 @@ public class NewTransaction extends AppCompatActivity {
     private TextView fuel_type, fuel_rate;
     private EditText et_fuel_litres, et_fuel_rs;
     private FloatingActionButton b_new_transaction;
-    private boolean isPetrol = false;
+    private boolean isPetrol,complete = false;
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
@@ -238,7 +238,7 @@ public class NewTransaction extends AppCompatActivity {
 
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.e("new transaction response", response.toString());
+                            Log.e("newTransaction response", response.toString());
                             try {
                                 if (response.getBoolean("success")) {
                                     Snackbar.make(coordinatorLayout, "Transaction Added.", Snackbar.LENGTH_SHORT).show();
