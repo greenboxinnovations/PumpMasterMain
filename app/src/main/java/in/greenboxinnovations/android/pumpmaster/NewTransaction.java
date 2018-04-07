@@ -138,55 +138,99 @@ public class NewTransaction extends AppCompatActivity {
     }
 
     private void clickPhoto() {
-        // this.current_photo = type;
+        if (isWiFiEnabled){
 
-        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/pump_master");
-        String type = "pump";
-        String filename = car_id + "_" + type + ".jpeg";
-        outputFile = new File(dir, filename);
+            String url = getResources().getString(R.string.url_main);
 
+            url = url + "/exe/snap_photo.php";
 
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            JSONObject jsonObj = new JSONObject();
+            try {
+                jsonObj.put("photo_type", "stop");
+                jsonObj.put("car_id", car_id);
+                jsonObj.put("pump_code",pump_code );
 
-        Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), "in.greenboxinnovations.android.pumpmaster.provider", outputFile);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(intent, 100);
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObj,
+                    new Response.Listener<JSONObject>() {
 
-    }
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("new transaction resp", response.toString());
+                            try {
+                                if (response.getBoolean("success")) {
+                                    //get photo url as response and display here
+                                    String photo_url =  response.getString("photo_url");
+                                    Log.e("photo_url", photo_url);
+                                } else {
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+                                    Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
 
-            case 100:
-                if (resultCode == RESULT_OK) {
-                    //sendFile(outputFile);
-                    Log.e("photo", "send");
-
-                    Bitmap bitmap = decodeSampledBitmapFromResource(outputFile, 640, 480);
-
-                    try {
-                        FileOutputStream out = new FileOutputStream(outputFile);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out);
-                        out.flush();
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (!isMyServiceRunning(UploadService.class)) {
-                        Intent i = new Intent(getApplication(), UploadService.class);
-                        startService(i);
-                        finish();
-                    }
-                } else if (resultCode == RESULT_CANCELED) {
-                    clickPhoto();
-                } else {
-                    Log.e("photo result", "else");
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Volley Error", "Error: " + error.getMessage());
+                    Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
                 }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("charset", "utf-8");
+                    return headers;
+                }
+            };
+            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+
+        }else{
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
         }
+
+
     }
+
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        switch (requestCode) {
+//
+//            case 100:
+//                if (resultCode == RESULT_OK) {
+//                    //sendFile(outputFile);
+//                    Log.e("photo", "send");
+//
+//                    Bitmap bitmap = decodeSampledBitmapFromResource(outputFile, 640, 480);
+//
+//                    try {
+//                        FileOutputStream out = new FileOutputStream(outputFile);
+//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out);
+//                        out.flush();
+//                        out.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    if (!isMyServiceRunning(UploadService.class)) {
+//                        Intent i = new Intent(getApplication(), UploadService.class);
+//                        startService(i);
+//                        finish();
+//                    }
+//                } else if (resultCode == RESULT_CANCELED) {
+//                    clickPhoto();
+//                } else {
+//                    Log.e("photo result", "else");
+//                }
+//        }
+//    }
 
     private void newTransaction() {
 
