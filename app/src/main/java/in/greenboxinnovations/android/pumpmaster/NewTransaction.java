@@ -53,11 +53,11 @@ public class NewTransaction extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
-    private int car_id,cust_id,user_id,pump_id,pump_code;
+    private int car_id, cust_id, user_id, pump_id, pump_code;
     private String shift;
 
     private File outputFile;
-    private boolean isWiFiEnabled,click = false;
+    private boolean isWiFiEnabled, click = false;
 
     private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
@@ -76,16 +76,16 @@ public class NewTransaction extends AppCompatActivity {
         p_rate = Double.valueOf(sharedPrefs.getString("petrol_rate", "-1"));
         d_rate = Double.valueOf(sharedPrefs.getString("diesel_rate", "-1"));
 
-        user_id = sharedPrefs.getInt("user_id",-1);
-        pump_id = sharedPrefs.getInt("pump_id",-1);
-        shift = sharedPrefs.getString("shift","");
+        user_id = sharedPrefs.getInt("user_id", -1);
+        pump_id = sharedPrefs.getInt("pump_id", -1);
+        shift = sharedPrefs.getString("shift", "");
 
         try {
             JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("jsonObject"));
             Log.e("tag", jsonObj.getString("cust_name"));
             isPetrol = jsonObj.getBoolean("isPetrol");
-            car_id   = jsonObj.getInt("car_id");
-            cust_id  = jsonObj.getInt("cust_id");
+            car_id = jsonObj.getInt("car_id");
+            cust_id = jsonObj.getInt("cust_id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -111,7 +111,7 @@ public class NewTransaction extends AppCompatActivity {
         b_new_transaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!click){
+                if (!click) {
                     click = true;
                     newTransaction();
                 }
@@ -248,11 +248,11 @@ public class NewTransaction extends AppCompatActivity {
             Snackbar.make(coordinatorLayout, "Empty Values Not Allowed", Snackbar.LENGTH_SHORT).show();
             click = false;
         } else {
-            sendData(fuel_rs,fuel_lit);
+            sendData(fuel_rs, fuel_lit);
         }
     }
 
-    private void sendData(String fuel_rs, String fuel_lit){
+    private void sendData(String fuel_rs, String fuel_lit) {
         if (isWiFiEnabled) {
 
             String url = getResources().getString(R.string.url_main);
@@ -263,14 +263,14 @@ public class NewTransaction extends AppCompatActivity {
             try {
                 jsonObj.put("isPetrol", isPetrol);
                 jsonObj.put("car_id", car_id);
-                jsonObj.put("amount",fuel_rs );
-                jsonObj.put("liters",fuel_lit );
-                jsonObj.put("cust_id",cust_id );
-                jsonObj.put("user_id",user_id );
-                jsonObj.put("pump_code",pump_code );
-                jsonObj.put("shift",shift );
-                jsonObj.put("fuel_rate",fuel_rate );
-                jsonObj.put("pump_id",pump_id );
+                jsonObj.put("amount", fuel_rs);
+                jsonObj.put("liters", fuel_lit);
+                jsonObj.put("cust_id", cust_id);
+                jsonObj.put("user_id", user_id);
+                jsonObj.put("pump_code", pump_code);
+                jsonObj.put("shift", shift);
+                jsonObj.put("fuel_rate", fuel_rate);
+                jsonObj.put("pump_id", pump_id);
 
             } catch (JSONException e) {
                 e.printStackTrace();

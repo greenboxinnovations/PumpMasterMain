@@ -9,17 +9,21 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.squareup.picasso.Picasso;
 
 
 public class TestActivity extends AppCompatActivity {
 
     private CoordinatorLayout coordinatorLayout;
     private int minBattLevel = 5;
+
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +42,13 @@ public class TestActivity extends AppCompatActivity {
         } else {
             showSnackBar("Insufficient Battery Level");
         }
+
+        loadPhoto("http://192.168.1.105/pump_master/uploads/2018-04-07/648_pump.jpeg");
     }
 
     private void init() {
         coordinatorLayout = findViewById(R.id.cl_test);
+        imageView = findViewById(R.id.im_test);
     }
 
 
@@ -86,6 +93,18 @@ public class TestActivity extends AppCompatActivity {
 
         Log.e("batt", "" + batLevel);
         return batLevel < level;
+    }
+
+
+    private void loadPhoto(String url) {
+//        Picasso.get()
+//                .load(url)
+//                .placeholder(R.drawable.user_placeholder)
+//                .error(R.drawable.user_placeholder_error)
+//                .into(imageView);
+        Picasso.get()
+                .load(url)
+                .into(imageView);
     }
 
 }
