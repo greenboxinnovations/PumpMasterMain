@@ -14,11 +14,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.squareup.picasso.Picasso;
 
 import junit.framework.Test;
 
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
     private int car_id,pump_code;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         diesel_rate = findViewById(R.id.tv_diesel_rate);
         user_name = findViewById(R.id.tv_user_name);
 
+        imageView = findViewById(R.id.dialog_imageview);
         jsonObject = null;
 
         petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate", "00.00")));
@@ -107,16 +112,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 101 && resultCode == RESULT_OK) {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
-                String val = barcode.displayValue;
-                pump_code = Integer.valueOf(val);
-                Log.e("Pump code", "" + val);
-                snapZeroPhoto();
-                Toast.makeText(getApplicationContext(), "Pump Code is " + val, Toast.LENGTH_SHORT).show();
 
-                Intent i = new Intent(getApplicationContext(), NewTransaction.class);
-                i.putExtra("jsonObject", jsonObject.toString());
-                i.putExtra("pump_code", val);
-                startActivity(i);
+                String val = barcode.displayValue;
+
+                pump_code = Integer.valueOf(val);
+
+                snapZeroPhoto(jsonObject, val);
             }
         }
     }
@@ -238,12 +239,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void snapZeroPhoto(){
+    private void snapZeroPhoto(JSONObject json, final String val){
         if (isWiFiEnabled){
+            final String url1 = getResources().getString(R.string.url_main);
 
-            String url = getResources().getString(R.string.url_main);
-
-            url = url + "/exe/snap_photo.php";
+            final String url = url1 + "/exe/snap_photo.php";
 
             JSONObject jsonObj = new JSONObject();
             try {
@@ -256,26 +256,56 @@ public class MainActivity extends AppCompatActivity {
             }
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                    url, jsonObj,
-                    new Response.Listener<JSONObject>() {
+                url, jsonObj,
+                new Response.Listener<JSONObject>() {
 
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.e("new transaction resp", response.toString());
-                            try {
-                                if (response.getBoolean("success")) {
-                                    //get photo url as response and display here
-                                   String photo_url =  response.getString("photo_url");
-                                    Log.e("photo_url", photo_url);
-                                } else {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("new transaction resp", response.toString());
+                        try {
+                            if (response.getBoolean("success")) {
+                                //get photo url as response and display here
+                                String photo_url =  response.getString("photo_url");
+                                Log.e("photo_url", photo_url);
 
-                                    Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                String url_photo = url1+"/"+photo_url;
+
+                                Log.e("photo photo_url", url_photo);
+
+                                ImageView image = new ImageView(MainActivity.this);
+
+                                Picasso.get().load(url_photo).into(image);
+
+                                final AlertDialog.Builder builder =
+                                    new AlertDialog.Builder(MainActivity.this).
+                                        setMessage("Zero sPhoto").
+                                        setPositiveButton("Start", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent i = new Intent(getApplicationContext(), NewTransaction.class);
+                                                i.putExtra("jsonObject", jsonObject.toString());
+                                                i.putExtra("pump_code", val);
+                                                startActivity(i);
+                                            }
+                                        }).
+                                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            }).
+                                        setView(image);
+                                builder.create().show();
+
+                            } else {
+
+                                Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    }, new Response.ErrorListener() {
+                    }
+                }, new Response.ErrorListener() {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
