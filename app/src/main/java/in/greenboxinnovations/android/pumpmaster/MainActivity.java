@@ -13,8 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +20,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -32,12 +29,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.squareup.picasso.Picasso;
 
-import junit.framework.Test;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
     private int car_id,pump_code;
-    private ImageView imageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         diesel_rate = findViewById(R.id.tv_diesel_rate);
         user_name = findViewById(R.id.tv_user_name);
 
-        imageView = findViewById(R.id.dialog_imageview);
+
         jsonObject = null;
 
         petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate", "00.00")));
@@ -97,6 +95,21 @@ public class MainActivity extends AppCompatActivity {
         user_name.setText(sharedPrefs.getString("user_name", "error"));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String date_login = String.valueOf(sharedPrefs.getString("date", ""));
+
+        Date cDate = new Date();
+        final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
+        Log.e("date",date);
+
+        if (!date.equals(date_login)){
+
+        }
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -267,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 ImageView image = new ImageView(MainActivity.this);
 
-                                Picasso.get().load(url_photo).resize(960,540).into(image);
+                                Picasso.get().load(url_photo).into(image);
 
                                 final AlertDialog.Builder builder =
                                     new AlertDialog.Builder(MainActivity.this).

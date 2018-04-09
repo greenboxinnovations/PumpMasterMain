@@ -3,20 +3,14 @@ package in.greenboxinnovations.android.pumpmaster;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -36,15 +30,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -176,7 +167,7 @@ public class NewTransaction extends AppCompatActivity {
 
                                     ImageView image = new ImageView(NewTransaction.this);
 
-                                    Picasso.get().load(url_photo).resize(960,540).into(image);
+                                    Picasso.get().load(url_photo).into(image);
 
                                     final AlertDialog.Builder builder =
                                         new AlertDialog.Builder(NewTransaction.this).
@@ -266,8 +257,8 @@ public class NewTransaction extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
-        String fuel_rs = et_fuel_litres.getText().toString();
-        String fuel_lit = et_fuel_rs.getText().toString();
+        String fuel_rs = et_fuel_rs.getText().toString();
+        String fuel_lit = et_fuel_litres.getText().toString();
 
         if (fuel_lit.equals("") || fuel_rs.equals("")) {
             Snackbar.make(coordinatorLayout, "Empty Values Not Allowed", Snackbar.LENGTH_SHORT).show();
@@ -287,6 +278,11 @@ public class NewTransaction extends AppCompatActivity {
             JSONObject jsonObj = new JSONObject();
             try {
                 jsonObj.put("isPetrol", isPetrol);
+                if (isPetrol){
+                    jsonObj.put("fuel_rate", p_rate);
+                }else{
+                    jsonObj.put("fuel_rate", d_rate);
+                }
                 jsonObj.put("car_id", car_id);
                 jsonObj.put("amount", fuel_rs);
                 jsonObj.put("liters", fuel_lit);
@@ -294,12 +290,13 @@ public class NewTransaction extends AppCompatActivity {
                 jsonObj.put("user_id", user_id);
                 jsonObj.put("pump_code", pump_code);
                 jsonObj.put("shift", shift);
-                jsonObj.put("fuel_rate", fuel_rate);
                 jsonObj.put("pump_id", pump_id);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            Log.e("Json Object", "obj" + jsonObj.toString());
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     url, jsonObj,
