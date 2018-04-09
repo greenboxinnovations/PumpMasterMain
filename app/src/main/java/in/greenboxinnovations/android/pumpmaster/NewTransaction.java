@@ -2,6 +2,7 @@ package in.greenboxinnovations.android.pumpmaster;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -10,11 +11,13 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -24,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,6 +36,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -140,9 +146,9 @@ public class NewTransaction extends AppCompatActivity {
     private void clickPhoto() {
         if (isWiFiEnabled){
 
-            String url = getResources().getString(R.string.url_main);
+            final String url1 = getResources().getString(R.string.url_main);
 
-            url = url + "/exe/snap_photo.php";
+            final String url = url1 + "/exe/snap_photo.php";
 
             JSONObject jsonObj = new JSONObject();
             try {
@@ -165,7 +171,26 @@ public class NewTransaction extends AppCompatActivity {
                                 if (response.getBoolean("success")) {
                                     //get photo url as response and display here
                                     String photo_url =  response.getString("photo_url");
-                                    Log.e("photo_url", photo_url);
+
+                                    String url_photo = url1+"/"+photo_url;
+
+                                    ImageView image = new ImageView(NewTransaction.this);
+
+                                    Picasso.get().load(url_photo).resize(960,540).into(image);
+
+                                    final AlertDialog.Builder builder =
+                                        new AlertDialog.Builder(NewTransaction.this).
+                                            setMessage("Zero Photo").
+                                            setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                   finish();
+                                                }
+                                            }).setCancelable(false).
+
+                                            setView(image);
+                                            builder.create().show();
+
                                 } else {
 
                                     Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
@@ -184,7 +209,7 @@ public class NewTransaction extends AppCompatActivity {
             }) {
 
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders(){
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json");
                     headers.put("charset", "utf-8");
@@ -285,7 +310,6 @@ public class NewTransaction extends AppCompatActivity {
                             Log.e("newTransaction response", response.toString());
                             try {
                                 if (response.getBoolean("success")) {
-                                    Snackbar.make(coordinatorLayout, "Transaction Added.", Snackbar.LENGTH_SHORT).show();
                                     clickPhoto();
                                 } else {
                                     Log.e("result", "fail");

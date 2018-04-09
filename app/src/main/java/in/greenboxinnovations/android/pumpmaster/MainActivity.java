@@ -104,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
-                Log.e("Car code", "" + val);
-                Toast.makeText(getApplicationContext(), "Car Code is " + val, Toast.LENGTH_SHORT).show();
                 isCodeValid(val);
             }
         }
@@ -199,8 +197,6 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 if (response.getBoolean("success")) {
 
-                                    Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
-
                                     jsonObject = response;
                                     car_id = response.getInt("car_id");
                                     Intent scan = new Intent(getApplicationContext(), Scan.class);
@@ -266,15 +262,12 @@ public class MainActivity extends AppCompatActivity {
                             if (response.getBoolean("success")) {
                                 //get photo url as response and display here
                                 String photo_url =  response.getString("photo_url");
-                                Log.e("photo_url", photo_url);
 
                                 String url_photo = url1+"/"+photo_url;
 
-                                Log.e("photo photo_url", url_photo);
-
                                 ImageView image = new ImageView(MainActivity.this);
 
-                                Picasso.get().load(url_photo).into(image);
+                                Picasso.get().load(url_photo).resize(960,540).into(image);
 
                                 final AlertDialog.Builder builder =
                                     new AlertDialog.Builder(MainActivity.this).
@@ -293,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     dialog.dismiss();
                                                 }
-                                            }).
+                                            }).setCancelable(false).
                                         setView(image);
                                 builder.create().show();
 
