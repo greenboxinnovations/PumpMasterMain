@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 final AlertDialog.Builder builder =
                                     new AlertDialog.Builder(MainActivity.this).
-                                        setMessage("Zero sPhoto").
+                                        setMessage("Zero Photo").
                                         setPositiveButton("Start", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
