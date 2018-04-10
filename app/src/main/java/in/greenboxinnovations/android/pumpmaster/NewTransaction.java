@@ -171,7 +171,7 @@ public class NewTransaction extends AppCompatActivity {
 
                                     final AlertDialog.Builder builder =
                                         new AlertDialog.Builder(NewTransaction.this).
-                                            setMessage("Zero Photo").
+                                            setMessage("Final Photo").
                                             setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
