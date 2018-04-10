@@ -106,7 +106,10 @@ public class MainActivity extends AppCompatActivity {
         Log.e("date",date);
 
         if (!date.equals(date_login)){
-
+            sharedPrefs.edit().clear().apply();
+            Intent i = new Intent(getApplicationContext(), Login.class);
+            startActivity(i);
+            finish();
         }
 
     }
