@@ -50,8 +50,8 @@ public class NewTransaction extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
-    private int car_id, cust_id, user_id, pump_id, pump_code;
-    private String shift;
+    private int car_id, cust_id, user_id, pump_id;
+    private String shift,pump_code;
 
     private File outputFile;
     private boolean isWiFiEnabled, click = false;
@@ -68,7 +68,7 @@ public class NewTransaction extends AppCompatActivity {
 
         init();
 
-        pump_code = Integer.valueOf(getIntent().getStringExtra("pump_code"));
+        pump_code = getIntent().getStringExtra("pump_code");
 
         p_rate = Double.valueOf(sharedPrefs.getString("petrol_rate", "-1"));
         d_rate = Double.valueOf(sharedPrefs.getString("diesel_rate", "-1"));

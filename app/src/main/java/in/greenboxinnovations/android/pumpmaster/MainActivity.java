@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefs;
     private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
-    private int car_id,pump_code;
+    private int car_id;
+    private  String pump_code;
 
 
     @Override
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         init();
         car_id = 0;
-        pump_code = 0;
+        pump_code = null;
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
+                Log.e("car_qr_code",""+val);
                 isCodeValid(val);
             }
         }
@@ -128,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
                 final Barcode barcode = data.getParcelableExtra("barcode");
 
                 String val = barcode.displayValue;
-
-                pump_code = Integer.valueOf(val);
+                Log.e("pump_qr_code",""+val);
+                pump_code = val;
 
                 snapZeroPhoto(jsonObject, val);
             }
