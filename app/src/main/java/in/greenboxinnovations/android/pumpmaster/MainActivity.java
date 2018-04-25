@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
     private int car_id;
-    private  String pump_code;
+    private String pump_code;
 
 
     @Override
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent scan = new Intent(getApplicationContext(), Scan.class);
-                scan.putExtra("title","Scan Car");
+                scan.putExtra("title", "Scan Car");
                 startActivityForResult(scan, 100);
             }
         });
@@ -104,9 +104,9 @@ public class MainActivity extends AppCompatActivity {
 
         Date cDate = new Date();
         final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
-        Log.e("date",date);
+        Log.e("date", date);
 
-        if (!date.equals(date_login)){
+        if (!date.equals(date_login)) {
             sharedPrefs.edit().clear().apply();
             Intent i = new Intent(getApplicationContext(), Login.class);
             startActivity(i);
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
-                Log.e("car_qr_code",""+val);
+                Log.e("car_qr_code", "" + val);
                 isCodeValid(val);
             }
         }
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 final Barcode barcode = data.getParcelableExtra("barcode");
 
                 String val = barcode.displayValue;
-                Log.e("pump_qr_code",""+val);
+                Log.e("pump_qr_code", "" + val);
                 pump_code = val;
 
                 snapZeroPhoto(jsonObject, val);
@@ -151,9 +151,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        if (item.getItemId() == R.id.enterReceipt) {
-//            showDialog();
-//        }
+        if (item.getItemId() == R.id.add_car_qr) {
+            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
+            startActivity(i);
+        }
         if (item.getItemId() == R.id.logout) {
             sharedPrefs.edit().clear().apply();
             Intent i = new Intent(getApplicationContext(), Login.class);
@@ -218,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                                     jsonObject = response;
                                     car_id = response.getInt("car_id");
                                     Intent scan = new Intent(getApplicationContext(), Scan.class);
-                                    scan.putExtra("title","Scan Pump");
+                                    scan.putExtra("title", "Scan Pump");
                                     startActivityForResult(scan, 101);
 
                                 } else {
@@ -248,13 +249,13 @@ public class MainActivity extends AppCompatActivity {
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
 
-        }else{
+        } else {
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
         }
     }
 
-    private void snapZeroPhoto(JSONObject json, final String val){
-        if (isWiFiEnabled){
+    private void snapZeroPhoto(JSONObject json, final String val) {
+        if (isWiFiEnabled) {
             final String url1 = getResources().getString(R.string.url_main);
 
             final String url = url1 + "/exe/snap_photo.php";
@@ -263,60 +264,60 @@ public class MainActivity extends AppCompatActivity {
             try {
                 jsonObj.put("photo_type", "start");
                 jsonObj.put("car_id", car_id);
-                jsonObj.put("pump_code",pump_code );
+                jsonObj.put("pump_code", pump_code);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                url, jsonObj,
-                new Response.Listener<JSONObject>() {
+                    url, jsonObj,
+                    new Response.Listener<JSONObject>() {
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.e("new transaction resp", response.toString());
-                        try {
-                            if (response.getBoolean("success")) {
-                                //get photo url as response and display here
-                                String photo_url =  response.getString("photo_url");
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("new transaction resp", response.toString());
+                            try {
+                                if (response.getBoolean("success")) {
+                                    //get photo url as response and display here
+                                    String photo_url = response.getString("photo_url");
 
-                                String url_photo = url1+"/"+photo_url;
+                                    String url_photo = url1 + "/" + photo_url;
 
-                                ImageView image = new ImageView(MainActivity.this);
+                                    ImageView image = new ImageView(MainActivity.this);
 
-                                Picasso.get().load(url_photo).into(image);
+                                    Picasso.get().load(url_photo).into(image);
 
-                                final AlertDialog.Builder builder =
-                                    new AlertDialog.Builder(MainActivity.this).
-                                        setMessage("Zero Photo").
-                                        setPositiveButton("Start", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Intent i = new Intent(getApplicationContext(), NewTransaction.class);
-                                                i.putExtra("jsonObject", jsonObject.toString());
-                                                i.putExtra("pump_code", val);
-                                                startActivity(i);
-                                            }
-                                        }).
-                                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                }
-                                            }).setCancelable(false).
-                                        setView(image);
-                                builder.create().show();
+                                    final AlertDialog.Builder builder =
+                                            new AlertDialog.Builder(MainActivity.this).
+                                                    setMessage("Zero Photo").
+                                                    setPositiveButton("Start", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            Intent i = new Intent(getApplicationContext(), NewTransaction.class);
+                                                            i.putExtra("jsonObject", jsonObject.toString());
+                                                            i.putExtra("pump_code", val);
+                                                            startActivity(i);
+                                                        }
+                                                    }).
+                                                    setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    }).setCancelable(false).
+                                                    setView(image);
+                                    builder.create().show();
 
-                            } else {
+                                } else {
 
-                                Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                }, new Response.ErrorListener() {
+                    }, new Response.ErrorListener() {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -335,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
 
-        }else{
+        } else {
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
         }
     }

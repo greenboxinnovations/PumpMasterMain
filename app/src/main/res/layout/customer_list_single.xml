@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:id="@+id/ll_cust_list"
+    android:clickable="true"
+    android:layout_margin="1dp"
+    android:background="#212121"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_cust_list_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="1"
+        android:textColor="#646464"
+        android:gravity="center_horizontal|center_vertical"
+        android:textSize="45sp"/>
+    <!-- #909090 disabled color-->
+    <!-- #149090 blue-->
+    <!-- 60 to light-->
+
+    <!-- 130dp height for high res phones-->
+    <!-- 100dp height for high res phones-->
+</LinearLayout>
