@@ -152,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.add_car_qr) {
-            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
-            startActivity(i);
+//            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
+//            startActivity(i);
         }
         if (item.getItemId() == R.id.logout) {
             sharedPrefs.edit().clear().apply();
