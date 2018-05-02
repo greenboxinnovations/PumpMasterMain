@@ -1,5 +1,6 @@
 package in.greenboxinnovations.android.pumpmaster;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.google.android.gms.vision.barcode.Barcode;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class CarList extends AppCompatActivity implements AdapterCustomerList.gridListener{
+public class CarList extends AppCompatActivity implements AdapterCustomerList.gridListener {
 
     private String url;
     private boolean isWiFiEnabled;
@@ -34,6 +36,8 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
     private ArrayList<POJO_id_string> carList = new ArrayList<>();
     private AdapterCustomerList.gridListener mListener;
+    private int cust_id = -1;
+    private static final int SCAN_QR_CODE_INTENT = 107;
 
 
     @Override
@@ -43,8 +47,9 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        getBundle(savedInstanceState);
         init();
+        getData();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -56,16 +61,16 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         });
     }
 
-    private void init(){
-        url = getResources().getString(R.string.url_main) + "/api/customers/1";
+    private void init() {
+        url = getResources().getString(R.string.url_main) + "/api/cars/1";
         MyGlobals myGlobals = new MyGlobals(getApplicationContext());
         isWiFiEnabled = myGlobals.isWiFiEnabled();
-        coordinatorLayout = findViewById(R.id.cl_new_transaction);
+        coordinatorLayout = findViewById(R.id.cl_car_list);
 
         mListener = this;
 
 
-        mRecyclerView = findViewById(R.id.rv_customer_list);
+        mRecyclerView = findViewById(R.id.rv_car_list);
         assert mRecyclerView != null;
         mAdapter = new AdapterCustomerList(carList, this, mListener);
         linearLayoutManager = new LinearLayoutManager(this);
@@ -74,12 +79,30 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    private void getBundle(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if (extras == null) {
+                cust_id = -1;
+            } else {
+                cust_id = extras.getInt("cust_id");
+            }
+        } else {
+            cust_id = (int) savedInstanceState.getSerializable("cust_id");
+        }
+
+        Log.e("tag", " " + cust_id);
+    }
+
+
     private void getData() {
+        String url_local = url + "/" + cust_id;
+        Log.e("url", url_local);
         if (isWiFiEnabled) {
 
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                     Request.Method.GET,
-                    url,
+                    url_local,
                     null,
                     new Response.Listener<JSONArray>() {
                         @Override
@@ -87,38 +110,25 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
                             carList.clear();
                             Log.e("resp", response.toString());
 
-//                            try {
-//                                for (int i = 0; i < response.length(); i++) {
-//                                    // Get current json object
-//                                    JSONObject customer = response.getJSONObject(i);
-//
-//                                    // Get the current student (json object) data
-//                                    String cust_company = customer.getString("cust_company");
-//                                    String cust_f_name = customer.getString("cust_f_name");
-//                                    String cust_l_name = customer.getString("cust_l_name");
-//                                    int cust_id = customer.getInt("cust_id");
-//
-//                                    String display_name = "";
-//                                    if (cust_company.equals("")) {
-//                                        display_name = cust_f_name + " " + cust_l_name;
-//                                    } else {
-//                                        display_name = cust_company;
-//                                    }
-////                                    Log.e("cust_names", display_name);
-//
-//
-//                                    POJO_id_string pojo = new POJO_id_string();
-////                                    pojo.setCust_id(cust_id);
-//                                    pojo.setDisplay_name(display_name);
-//                                    carList.add(pojo);
-//
-//                                }
-////                                mAdapter.updateReceiptsList(customerList);
-//                                mAdapter.notifyDataSetChanged();
-//                                Log.e("size", "" + customerList.size());
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
+                            try {
+                                for (int i = 0; i < response.length(); i++) {
+                                    // Get current json object
+                                    JSONObject car = response.getJSONObject(i);
+                                    String car_no_plate = car.getString("car_no_plate");
+                                    int car_id = car.getInt("car_id");
+
+                                    POJO_id_string pojo = new POJO_id_string();
+                                    pojo.setCust_id(car_id);
+                                    pojo.setDisplay_name(car_no_plate);
+                                    carList.add(pojo);
+
+                                }
+//                                mAdapter.updateReceiptsList(customerList);
+                                mAdapter.notifyDataSetChanged();
+                                Log.e("size", "" + carList.size());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     },
                     new Response.ErrorListener() {
@@ -139,7 +149,21 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
 
     @Override
-    public void logStuff(int position) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SCAN_QR_CODE_INTENT && resultCode == RESULT_OK) {
+            if (data != null) {
+                final Barcode barcode = data.getParcelableExtra("barcode");
+                String val = barcode.displayValue;
+                Log.e("car_qr_code", "" + val);
+            }
+        }
+    }
 
+
+    @Override
+    public void listClick(int position) {
+        Intent scan = new Intent(getApplicationContext(), Scan.class);
+        scan.putExtra("title", "Scan Car");
+        startActivityForResult(scan, SCAN_QR_CODE_INTENT);
     }
 }

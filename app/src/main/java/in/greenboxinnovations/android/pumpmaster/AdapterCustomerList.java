@@ -51,7 +51,7 @@ public class AdapterCustomerList extends RecyclerView.Adapter<AdapterCustomerLis
         holder.tile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.logStuff(position);
+                mListener.listClick(position);
             }
         });
     }
@@ -92,6 +92,6 @@ public class AdapterCustomerList extends RecyclerView.Adapter<AdapterCustomerLis
 //        void changeKart(View v, int position);
 //
 //        void dialog(int position);
-        void logStuff(int position);
+        void listClick(int position);
     }
 }

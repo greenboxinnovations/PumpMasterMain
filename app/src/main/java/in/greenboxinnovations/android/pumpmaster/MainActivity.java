@@ -41,8 +41,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     MyGlobals myGlobals;
-    boolean isWiFiEnabled;
-    CoordinatorLayout coordinatorLayout;
+    private boolean isWiFiEnabled;
+    private CoordinatorLayout coordinatorLayout;
     private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
     private JSONObject jsonObject;
@@ -152,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.add_car_qr) {
-//            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
-//            startActivity(i);
+            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
+            startActivity(i);
         }
         if (item.getItemId() == R.id.logout) {
             sharedPrefs.edit().clear().apply();

@@ -24,6 +24,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -50,12 +51,16 @@ import java.util.Map;
 
 public class Login extends AppCompatActivity {
 
+    MyGlobals myGlobals;
     private CoordinatorLayout coordinatorLayout;
     private TextView userName, password;
+    private String userNameVal, passwordVal;
     private ProgressBar progress_bar;
     private Button login, retry;
     private LinearLayout login_layout;
     private RelativeLayout no_connection_layout;
+
+    private boolean isWiFiEnabled;
 
     //shared pref variables
     private static final String APP_SHARED_PREFS = "prefs";
@@ -69,7 +74,8 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
+        myGlobals = new MyGlobals(getApplicationContext());
+        isWiFiEnabled = myGlobals.isWiFiEnabled();
 
         init();
         // checkers
@@ -105,6 +111,20 @@ public class Login extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        isWiFiEnabled = myGlobals.isWiFiEnabled();
+        if (!isWiFiEnabled) {
+            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibe != null) {
+                vibe.vibrate(50);
+            }
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+            login_layout.setVisibility(View.INVISIBLE);
+            no_connection_layout.setVisibility(View.VISIBLE);
+        } else {
+            login_layout.setVisibility(View.VISIBLE);
+            no_connection_layout.setVisibility(View.INVISIBLE);
+        }
+
         if (!sharedPrefs.getString("shift", "").equals("")) {
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
@@ -134,7 +154,7 @@ public class Login extends AppCompatActivity {
     private void init() {
 
         progress_bar = findViewById(R.id.pb_login);
-        retry = findViewById(R.id.b_login_retry);
+        retry = findViewById(R.id.b_wifi_retry);
         login_layout = findViewById(R.id.login_layout);
         no_connection_layout = findViewById(R.id.no_connection_layout);
 
@@ -160,8 +180,11 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    private void redirect(){
+    private void redirect() {
         Intent i = new Intent(getApplicationContext(), SetRates.class);
+        i.putExtra("userNameVal", userNameVal);
+        i.putExtra("passwordVal", passwordVal);
+        i.putExtra("imei", imei);
         startActivity(i);
         finish();
     }
@@ -172,16 +195,23 @@ public class Login extends AppCompatActivity {
 
         String url = getResources().getString(R.string.url_main);
 
-        url = url+"/exe/login_and.php";
+        url = url + "/exe/login_and.php";
 
         Date cDate = new Date();
         final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
-        Log.e("date",date);
+        Log.e("date", date);
 
-        String name = userName.getText().toString();
-        final String pass = password.getText().toString();
+        userNameVal = userName.getText().toString();
+        passwordVal = password.getText().toString();
         if ((userName.getText().length() == 0) || (password.getText().length() == 0)) {
             //Toast.makeText(this, "Fill All Fields!", Toast.LENGTH_SHORT).show();
+            View view = Login.this.getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                view.clearFocus();
+            }
             Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
         } else {
 
@@ -191,8 +221,8 @@ public class Login extends AppCompatActivity {
 
             JSONObject jsonObj = new JSONObject();
             try {
-                jsonObj.put("name", name);
-                jsonObj.put("pass", pass);
+                jsonObj.put("name", userNameVal);
+                jsonObj.put("pass", passwordVal);
                 jsonObj.put("imei", imei);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -214,7 +244,7 @@ public class Login extends AppCompatActivity {
                             try {
                                 if (response.getBoolean("success")) {
                                     Log.e("result", "success");
-                                    if ((response.getString("date").equals(date))&&(response.getBoolean("rate_set"))) {
+                                    if ((response.getString("date").equals(date)) && (response.getBoolean("rate_set"))) {
 
                                         Snackbar.make(coordinatorLayout, "Access Granted.", Snackbar.LENGTH_SHORT).show();
                                         sharedPrefs.edit()
@@ -226,12 +256,22 @@ public class Login extends AppCompatActivity {
                                                 .putString("user_name", response.getString("user_name"))
                                                 .apply();
                                         showDialog();
-                                    }else{
+                                    } else {
                                         redirect();
                                     }
 
                                 } else {
                                     Log.e("result", "fail");
+                                    // hide the keyboard
+                                    View view = Login.this.getCurrentFocus();
+                                    if (view != null) {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        assert imm != null;
+                                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                        view.clearFocus();
+                                    }
+
+
                                     Snackbar.make(coordinatorLayout, "Access Denied Or Wrong User", Snackbar.LENGTH_SHORT).show();
                                     sharedPrefs.edit()
                                             .putInt("user_id", -1)
@@ -291,7 +331,7 @@ public class Login extends AppCompatActivity {
 
     }
 
-    private void next(String shift){
+    private void next(String shift) {
         sharedPrefs.edit().putString("shift", shift).apply();
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(i);
@@ -300,11 +340,12 @@ public class Login extends AppCompatActivity {
 
     // checkers
     private void networkChecker() {
-        if (isNetworkAvailable()) {
+        isWiFiEnabled = myGlobals.isWiFiEnabled();
+        if (isNetworkAvailable() && isWiFiEnabled) {
             login_layout.setVisibility(View.VISIBLE);
-            no_connection_layout.setVisibility(View.GONE);
+            no_connection_layout.setVisibility(View.INVISIBLE);
         } else {
-            login_layout.setVisibility(View.GONE);
+            login_layout.setVisibility(View.INVISIBLE);
             no_connection_layout.setVisibility(View.VISIBLE);
         }
     }

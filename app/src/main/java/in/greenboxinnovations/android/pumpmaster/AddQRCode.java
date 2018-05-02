@@ -115,7 +115,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
 
 
                                     POJO_id_string pojo = new POJO_id_string();
-//                                    pojo.setCust_id(cust_id);
+                                    pojo.setCust_id(cust_id);
                                     pojo.setDisplay_name(display_name);
                                     customerList.add(pojo);
 
@@ -145,8 +145,11 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
     }
 
     @Override
-    public void logStuff(int position) {
+    public void listClick(int position) {
         Intent i = new Intent(getApplicationContext(), CarList.class);
+        int cust_id = customerList.get(position).getCust_id();
+//        Log.e("cust", "" + cust_id);
+        i.putExtra("cust_id", cust_id);
         startActivity(i);
     }
 }
