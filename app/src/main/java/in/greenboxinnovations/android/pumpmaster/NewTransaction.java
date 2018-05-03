@@ -341,6 +341,10 @@ public class NewTransaction extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+    }
 
     private class GenericTextWatcher implements TextWatcher {
 
