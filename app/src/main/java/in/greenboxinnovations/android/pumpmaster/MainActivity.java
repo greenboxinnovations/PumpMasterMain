@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        isWiFiEnabled = myGlobals.isWiFiEnabled();
+
         String date_login = String.valueOf(sharedPrefs.getString("date", ""));
 
         Date cDate = new Date();
