@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Pump Master</string>
-    <string name="url_main">http://192.168.1.115/pump_master</string>
+    <string name="url_main">http://192.168.0.100/pump_master</string>
     <string name="url_hosted">http://pumpmastertest.greenboxinnovations.in</string>
     <string name="url_app">http://192.168.0.100/pump_master/app/download.php?app_name=operator</string>
     <string name="url_check_version">http://192.168.0.100/pump_master/exe/check_version.php</string>

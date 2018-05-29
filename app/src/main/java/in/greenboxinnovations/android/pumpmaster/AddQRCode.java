@@ -3,15 +3,12 @@ package in.greenboxinnovations.android.pumpmaster;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -30,13 +27,9 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
     private boolean isWiFiEnabled;
     private CoordinatorLayout coordinatorLayout;
 
-    private RecyclerView mRecyclerView;
-    private GridLayoutManager gridLayoutManager;
-    private LinearLayoutManager linearLayoutManager;
     private AdapterCustomerList mAdapter;
 
     private ArrayList<POJO_id_string> customerList = new ArrayList<>();
-    private AdapterCustomerList.gridListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,15 +42,6 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
         init();
         getData();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                sendData();
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     private void init() {
@@ -66,15 +50,15 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
         isWiFiEnabled = myGlobals.isWiFiEnabled();
         coordinatorLayout = findViewById(R.id.cl_add_qr_code);
 
-        mListener = this;
+        AdapterCustomerList.gridListener mListener = this;
 
 
-        mRecyclerView = findViewById(R.id.rv_customer_list);
+        RecyclerView mRecyclerView = findViewById(R.id.rv_customer_list);
         assert mRecyclerView != null;
 //        mRecyclerView.setHasFixedSize(true);
         mAdapter = new AdapterCustomerList(customerList, this, mListener);
 //        gridLayoutManager = new GridLayoutManager(this, 2);
-        linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
 
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -105,7 +89,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
                                     String cust_l_name = customer.getString("cust_l_name");
                                     int cust_id = customer.getInt("cust_id");
 
-                                    String display_name = "";
+                                    String display_name;
                                     if (cust_company.equals("")) {
                                         display_name = cust_f_name + " " + cust_l_name;
                                     } else {
