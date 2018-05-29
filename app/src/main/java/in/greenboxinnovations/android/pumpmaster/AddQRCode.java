@@ -64,7 +64,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
         url = getResources().getString(R.string.url_main) + "/api/customers/1";
         MyGlobals myGlobals = new MyGlobals(getApplicationContext());
         isWiFiEnabled = myGlobals.isWiFiEnabled();
-        coordinatorLayout = findViewById(R.id.cl_new_transaction);
+        coordinatorLayout = findViewById(R.id.cl_add_qr_code);
 
         mListener = this;
 
