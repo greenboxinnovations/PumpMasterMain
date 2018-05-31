@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -71,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                if (vibe != null) {
+                    vibe.vibrate(50);
+                }
                 Intent scan = new Intent(getApplicationContext(), Scan.class);
                 scan.putExtra("title", "Scan Car");
                 startActivityForResult(scan, 100);
@@ -297,6 +302,10 @@ public class MainActivity extends AppCompatActivity {
                                                     setPositiveButton("Start", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
+                                                            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                            if (vibe != null) {
+                                                                vibe.vibrate(50);
+                                                            }
                                                             Intent i = new Intent(getApplicationContext(), NewTransaction.class);
                                                             i.putExtra("jsonObject", jsonObject.toString());
                                                             i.putExtra("pump_code", val);

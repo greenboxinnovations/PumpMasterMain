@@ -162,6 +162,8 @@ public class Login extends AppCompatActivity {
         password = findViewById(R.id.et_Pass);
         login = findViewById(R.id.bLoginBtn);
 
+
+
         coordinatorLayout = findViewById(R.id.login_view);
 
         sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);

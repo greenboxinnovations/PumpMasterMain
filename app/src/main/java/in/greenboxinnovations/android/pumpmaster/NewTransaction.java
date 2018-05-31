@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -43,15 +44,15 @@ public class NewTransaction extends AppCompatActivity {
 
     private double p_rate = -1;
     private double d_rate = -1;
-    private TextView fuel_type, fuel_rate;
+    private TextView fuel_type, fuel_rate, tv_car_no_plate, tv_cust_name;
     private EditText et_fuel_litres, et_fuel_rs;
     private FloatingActionButton b_new_transaction;
-    private boolean isPetrol,complete = false;
+    private boolean isPetrol, complete = false;
     private CoordinatorLayout coordinatorLayout;
     boolean keyLock = false;
     private RelativeLayout rl_back;
     private int car_id, cust_id, user_id, pump_id;
-    private String shift,pump_code;
+    private String shift, pump_code, cust_name, car_no;
 
     private File outputFile;
     private boolean isWiFiEnabled, click = false;
@@ -83,9 +84,16 @@ public class NewTransaction extends AppCompatActivity {
             isPetrol = jsonObj.getBoolean("isPetrol");
             car_id = jsonObj.getInt("car_id");
             cust_id = jsonObj.getInt("cust_id");
+            cust_name = jsonObj.getString("cust_name");
+            car_no = jsonObj.getString("car_no");
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
+        tv_car_no_plate.setText(car_no);
+        tv_cust_name.setText(cust_name);
+
 
         if (isPetrol) {
             rl_back.setBackgroundColor(Color.parseColor("#0D9F56"));
@@ -109,6 +117,10 @@ public class NewTransaction extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!click) {
+                    Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    if (vibe != null) {
+                        vibe.vibrate(50);
+                    }
                     click = true;
                     newTransaction();
                 }
@@ -129,13 +141,17 @@ public class NewTransaction extends AppCompatActivity {
         fuel_type = findViewById(R.id.tv_fuel_type);
         fuel_rate = findViewById(R.id.tv_fuel_rate);
         et_fuel_litres = findViewById(R.id.et_lit);
+
+        tv_car_no_plate = findViewById(R.id.tv_car_no_plate);
+        tv_cust_name = findViewById(R.id.tv_cust_name);
+
         et_fuel_rs = findViewById(R.id.et_rs);
         b_new_transaction = findViewById(R.id.b_new_transaction);
         rl_back = findViewById(R.id.rl_back);
     }
 
     private void clickPhoto() {
-        if (isWiFiEnabled){
+        if (isWiFiEnabled) {
 
             final String url1 = getResources().getString(R.string.url_main);
 
@@ -145,7 +161,7 @@ public class NewTransaction extends AppCompatActivity {
             try {
                 jsonObj.put("photo_type", "stop");
                 jsonObj.put("car_id", car_id);
-                jsonObj.put("pump_code",pump_code );
+                jsonObj.put("pump_code", pump_code);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -161,26 +177,30 @@ public class NewTransaction extends AppCompatActivity {
                             try {
                                 if (response.getBoolean("success")) {
                                     //get photo url as response and display here
-                                    String photo_url =  response.getString("photo_url");
+                                    String photo_url = response.getString("photo_url");
 
-                                    String url_photo = url1+"/"+photo_url;
+                                    String url_photo = url1 + "/" + photo_url;
 
                                     ImageView image = new ImageView(NewTransaction.this);
 
                                     Picasso.get().load(url_photo).into(image);
 
                                     final AlertDialog.Builder builder =
-                                        new AlertDialog.Builder(NewTransaction.this).
-                                            setMessage("Final Photo").
-                                            setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                   finish();
-                                                }
-                                            }).setCancelable(false).
+                                            new AlertDialog.Builder(NewTransaction.this).
+                                                    setMessage("Final Photo").
+                                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                            if (vibe != null) {
+                                                                vibe.vibrate(50);
+                                                            }
+                                                            finish();
+                                                        }
+                                                    }).setCancelable(false).
 
-                                            setView(image);
-                                            builder.create().show();
+                                                    setView(image);
+                                    builder.create().show();
 
                                 } else {
 
@@ -200,7 +220,7 @@ public class NewTransaction extends AppCompatActivity {
             }) {
 
                 @Override
-                public Map<String, String> getHeaders(){
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json");
                     headers.put("charset", "utf-8");
@@ -209,7 +229,7 @@ public class NewTransaction extends AppCompatActivity {
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
 
-        }else{
+        } else {
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
         }
 
@@ -278,9 +298,9 @@ public class NewTransaction extends AppCompatActivity {
             JSONObject jsonObj = new JSONObject();
             try {
                 jsonObj.put("isPetrol", isPetrol);
-                if (isPetrol){
+                if (isPetrol) {
                     jsonObj.put("fuel_rate", p_rate);
-                }else{
+                } else {
                     jsonObj.put("fuel_rate", d_rate);
                 }
                 jsonObj.put("car_id", car_id);
