@@ -130,6 +130,8 @@ public class NewTransaction extends AppCompatActivity {
         });
     }
 
+
+
     private void init() {
 
         MyGlobals myGlobals = new MyGlobals(getApplicationContext());
@@ -278,13 +280,22 @@ public class NewTransaction extends AppCompatActivity {
         }
 
         String fuel_rs = et_fuel_rs.getText().toString();
+
         String fuel_lit = et_fuel_litres.getText().toString();
 
         if (fuel_lit.equals("") || fuel_rs.equals("")) {
             Snackbar.make(coordinatorLayout, "Empty Values Not Allowed", Snackbar.LENGTH_SHORT).show();
             click = false;
         } else {
-            sendData(fuel_rs, fuel_lit);
+            Double maxValueAmount = Double.valueOf(fuel_rs);
+            Double maxValueLit = Double.valueOf(fuel_lit);
+            if ((maxValueAmount > 99999.99)||(maxValueLit >999.99)){
+                Snackbar.make(coordinatorLayout, "Amount has to be less than 99999.99 or lit less than 999.99", Snackbar.LENGTH_SHORT).show();
+                click = false;
+            }else{
+                sendData(fuel_rs, fuel_lit);
+            }
+
         }
     }
 
