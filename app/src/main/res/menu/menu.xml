@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Add Car QR Code" android:id="@+id/add_car_qr"/>
-    <item android:title="Logout" android:id="@+id/logout"/>
+    <item android:title="@string/add_car_qr_code" android:id="@+id/add_car_qr"/>
+    <item android:title="@string/logout" android:id="@+id/logout"/>
 </menu>

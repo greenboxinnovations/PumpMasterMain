@@ -22,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -104,6 +106,27 @@ public class Login extends AppCompatActivity {
                 networkChecker();
             }
         });
+
+    }
+
+    // Ensure the right menu is setup
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.login_menu, menu);
+        return true;
+    }
+
+
+    // Start your settings activity when a menu item is selected
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.add_car_qr_new) {
+          showDialog_pass();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("HardwareIds")
@@ -161,8 +184,6 @@ public class Login extends AppCompatActivity {
         userName = findViewById(R.id.et_Name);
         password = findViewById(R.id.et_Pass);
         login = findViewById(R.id.bLoginBtn);
-
-
 
         coordinatorLayout = findViewById(R.id.login_view);
 
@@ -327,6 +348,36 @@ public class Login extends AppCompatActivity {
                         next("a");
                     }
                 })
+                .create();
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        dialog.show();
+
+    }
+
+    private void showDialog_pass() {
+
+        final EditText input = new EditText(this);
+
+        input.setWidth(60);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Enter Password")
+                .setView(input)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int val = Integer.valueOf(String.valueOf(input.getText()));
+                        if (val == 124578){
+                            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
+                            startActivity(i);
+                        }else{
+                            Snackbar.make(coordinatorLayout, "Access Denied", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", null)
                 .create();
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         dialog.show();

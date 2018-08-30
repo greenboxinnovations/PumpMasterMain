@@ -11,5 +11,7 @@
     <string name="title_activity_new_transaction">New Transaction</string>
     <string name="title_activity_add_qrcode">AddQRCode</string>
     <string name="title_activity_car_list">CarList</string>
+    <string name="add_car_qr_code">Add Car / QR Code</string>
+    <string name="logout">Logout</string>
 
 </resources>

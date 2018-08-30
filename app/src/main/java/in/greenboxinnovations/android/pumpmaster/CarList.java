@@ -35,7 +35,7 @@ import java.util.Map;
 public class CarList extends AppCompatActivity implements AdapterCustomerList.gridListener {
 
     private String url;
-    private boolean isWiFiEnabled;
+
     private CoordinatorLayout coordinatorLayout;
 
     private AdapterCustomerList mAdapter;
@@ -62,14 +62,11 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
     }
 
     private void init() {
-        url = getResources().getString(R.string.url_main) + "/api/cars/1";
-        MyGlobals myGlobals = new MyGlobals(getApplicationContext());
-        isWiFiEnabled = myGlobals.isWiFiEnabled();
+        url = getResources().getString(R.string.url_hosted) + "/api/cars/1";
         coordinatorLayout = findViewById(R.id.cl_car_list);
         progressBar = findViewById(R.id.pb_loading);
 
         AdapterCustomerList.gridListener mListener = this;
-
 
         RecyclerView mRecyclerView = findViewById(R.id.rv_car_list);
         assert mRecyclerView != null;
@@ -100,54 +97,60 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         String url_local = url + "/" + cust_id;
 
         Log.e("url", url_local);
-        if (isWiFiEnabled) {
-
-            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-                    Request.Method.GET,
-                    url_local,
-                    null,
-                    new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            carList.clear();
-                            Log.e("resp", response.toString());
 
 
-                            try {
-                                for (int i = 0; i < response.length(); i++) {
-                                    // Get current json object
-                                    JSONObject car = response.getJSONObject(i);
-                                    String car_no_plate = car.getString("car_no_plate");
-                                    int car_id = car.getInt("car_id");
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+                Request.Method.GET,
+                url_local,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        carList.clear();
 
-                                    POJO_id_string pojo = new POJO_id_string();
-                                    pojo.setCust_id(car_id);
-                                    pojo.setDisplay_name(car_no_plate);
-                                    carList.add(pojo);
+                        POJO_id_string pojo1 = new POJO_id_string();
+                        pojo1.setCust_id(-99);
+                        pojo1.setDisplay_name("ADD NEW CAR");
+                        carList.add(pojo1);
+                        mAdapter.notifyDataSetChanged();
 
-                                }
-//                                mAdapter.updateReceiptsList(customerList);
-                                mAdapter.notifyDataSetChanged();
-                                Log.e("size", "" + carList.size());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                        Log.e("resp", response.toString());
+
+
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                // Get current json object
+                                JSONObject car = response.getJSONObject(i);
+                                String car_no_plate = car.getString("car_no_plate");
+                                int car_id = car.getInt("car_id");
+
+                                POJO_id_string pojo = new POJO_id_string();
+                                pojo.setCust_id(car_id);
+                                pojo.setDisplay_name(car_no_plate);
+                                carList.add(pojo);
+
                             }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            // Do something when error occurred
-                            Snackbar.make(
-                                    coordinatorLayout,
-                                    "Error fetching JSON",
-                                    Snackbar.LENGTH_LONG
-                            ).show();
+//                                mAdapter.updateReceiptsList(customerList);
+                            mAdapter.notifyDataSetChanged();
+                            Log.e("size", "" + carList.size());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-            );
-            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonArrayRequest);
-        }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Do something when error occurred
+                        Snackbar.make(
+                                coordinatorLayout,
+                                "Error fetching JSON",
+                                Snackbar.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
+        MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonArrayRequest);
     }
 
 
@@ -166,10 +169,19 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
     @Override
     public void listClick(int position) {
-        Intent scan = new Intent(getApplicationContext(), Scan.class);
-        scan.putExtra("title", "Scan QR Code");
+
         car_id = carList.get(position).getCust_id();
-        startActivityForResult(scan, SCAN_QR_CODE_INTENT);
+
+        if (car_id == -99) {
+            Intent i = new Intent(getApplicationContext(), AddNewCar.class);
+            i.putExtra("cust_id", cust_id);
+            startActivity(i);
+        } else {
+            Intent scan = new Intent(getApplicationContext(), Scan.class);
+            scan.putExtra("title", "Scan QR Code");
+
+            startActivityForResult(scan, SCAN_QR_CODE_INTENT);
+        }
     }
 
 

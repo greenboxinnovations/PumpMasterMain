@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.gridListener {
 
     private String url;
-    private boolean isWiFiEnabled;
+
     private CoordinatorLayout coordinatorLayout;
 
     private AdapterCustomerList mAdapter;
@@ -38,16 +38,13 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         init();
         getData();
 
     }
 
     private void init() {
-        url = getResources().getString(R.string.url_main) + "/api/customers/1";
-        MyGlobals myGlobals = new MyGlobals(getApplicationContext());
-        isWiFiEnabled = myGlobals.isWiFiEnabled();
+        url = getResources().getString(R.string.url_hosted) + "/api/customers/1";
         coordinatorLayout = findViewById(R.id.cl_add_qr_code);
 
         AdapterCustomerList.gridListener mListener = this;
@@ -66,74 +63,88 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
 
 
     private void getData() {
-        if (isWiFiEnabled) {
 
-            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-                    Request.Method.GET,
-                    url,
-                    null,
-                    new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            customerList.clear();
-                            Log.e("resp", response.toString());
 
-                            try {
-                                for (int i = 0; i < response.length(); i++) {
-                                    // Get current json object
-                                    JSONObject customer = response.getJSONObject(i);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        customerList.clear();
 
-                                    // Get the current student (json object) data
-                                    String cust_company = customer.getString("cust_company");
-                                    String cust_f_name = customer.getString("cust_f_name");
-                                    String cust_l_name = customer.getString("cust_l_name");
-                                    int cust_id = customer.getInt("cust_id");
+                        POJO_id_string pojo1 = new POJO_id_string();
+                        pojo1.setCust_id(-99);
+                        pojo1.setDisplay_name("ADD NEW CUSTOMER");
+                        customerList.add(pojo1);
+                        mAdapter.notifyDataSetChanged();
 
-                                    String display_name;
-                                    if (cust_company.equals("")) {
-                                        display_name = cust_f_name + " " + cust_l_name;
-                                    } else {
-                                        display_name = cust_company;
-                                    }
+
+                        Log.e("resp", response.toString());
+
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                // Get current json object
+                                JSONObject customer = response.getJSONObject(i);
+
+                                // Get the current student (json object) data
+                                String cust_company = customer.getString("cust_company");
+                                String cust_f_name = customer.getString("cust_f_name");
+                                String cust_l_name = customer.getString("cust_l_name");
+                                int cust_id = customer.getInt("cust_id");
+
+                                String display_name;
+                                if (cust_company.equals("")) {
+                                    display_name = cust_f_name + " " + cust_l_name;
+                                } else {
+                                    display_name = cust_company;
+                                }
 //                                    Log.e("cust_names", display_name);
 
 
-                                    POJO_id_string pojo = new POJO_id_string();
-                                    pojo.setCust_id(cust_id);
-                                    pojo.setDisplay_name(display_name);
-                                    customerList.add(pojo);
+                                POJO_id_string pojo = new POJO_id_string();
+                                pojo.setCust_id(cust_id);
+                                pojo.setDisplay_name(display_name);
+                                customerList.add(pojo);
 
-                                }
-//                                mAdapter.updateReceiptsList(customerList);
-                                mAdapter.notifyDataSetChanged();
-                                Log.e("size", "" + customerList.size());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            // Do something when error occurred
-                            Snackbar.make(
-                                    coordinatorLayout,
-                                    "Error fetching JSON",
-                                    Snackbar.LENGTH_LONG
-                            ).show();
+//                                mAdapter.updateReceiptsList(customerList);
+                            mAdapter.notifyDataSetChanged();
+                            Log.e("size", "" + customerList.size());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-            );
-            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonArrayRequest);
-        }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Do something when error occurred
+                        Snackbar.make(
+                                coordinatorLayout,
+                                "Error fetching JSON",
+                                Snackbar.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
+        MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonArrayRequest);
+
     }
 
     @Override
     public void listClick(int position) {
-        Intent i = new Intent(getApplicationContext(), CarList.class);
         int cust_id = customerList.get(position).getCust_id();
-//        Log.e("cust", "" + cust_id);
-        i.putExtra("cust_id", cust_id);
-        startActivity(i);
+        if (cust_id == -99) {
+            Intent i = new Intent(getApplicationContext(), AddNewCustomer.class);
+            startActivity(i);
+        } else {
+
+            Intent i = new Intent(getApplicationContext(), CarList.class);
+
+            i.putExtra("cust_id", cust_id);
+            startActivity(i);
+        }
     }
 }
