@@ -39,8 +39,14 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
         setSupportActionBar(toolbar);
 
         init();
-        getData();
 
+
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        getData();
     }
 
     private void init() {

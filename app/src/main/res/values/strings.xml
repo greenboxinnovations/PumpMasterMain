@@ -8,6 +8,7 @@
     <!--<string name="url_login">http://fuelmaster.greenboxinnovations.in/exe/login_and.php</string>-->
     <!--<string name="url_check_version">http://fuelmaster.greenboxinnovations.in/exe/check_version.php</string>-->
     <string name="app_version">1</string>
+    <string name="url_add_customer">http://fuelmaster.greenboxinnovations.in/api/customers</string>
     <string name="title_activity_new_transaction">New Transaction</string>
     <string name="title_activity_add_qrcode">AddQRCode</string>
     <string name="title_activity_car_list">CarList</string>
