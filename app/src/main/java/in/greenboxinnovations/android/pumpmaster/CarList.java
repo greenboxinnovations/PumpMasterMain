@@ -56,9 +56,15 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
         getBundle(savedInstanceState);
         init();
+
+
+
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
         getData();
-
-
     }
 
     private void init() {
