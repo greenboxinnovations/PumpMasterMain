@@ -9,7 +9,6 @@
     tools:showIn="@layout/activity_add_qrcode">
 
 
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_customer_list"
         android:layout_width="0dp"
@@ -27,5 +26,20 @@
 
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintTop_creator="1" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/b_retry_customer_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="RETRY"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/rv_customer_list"
+        app:layout_constraintEnd_toEndOf="@+id/rv_customer_list"
+        app:layout_constraintStart_toStartOf="@+id/rv_customer_list"
+        app:layout_constraintTop_toTopOf="@+id/rv_customer_list" />
 
 </android.support.constraint.ConstraintLayout>

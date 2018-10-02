@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -31,6 +33,8 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
 
     private ArrayList<POJO_id_string> customerList = new ArrayList<>();
 
+    private AppCompatButton retry;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +44,12 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
 
         init();
 
-
+        retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getData();
+            }
+        });
     }
 
     @Override
@@ -55,6 +64,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
 
         AdapterCustomerList.gridListener mListener = this;
 
+        retry = findViewById(R.id.b_retry_customer_list);
 
         RecyclerView mRecyclerView = findViewById(R.id.rv_customer_list);
         assert mRecyclerView != null;
@@ -79,6 +89,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
                     @Override
                     public void onResponse(JSONArray response) {
                         customerList.clear();
+                        retry.setVisibility(View.GONE);
 
                         POJO_id_string pojo1 = new POJO_id_string();
                         pojo1.setCust_id(-99);
@@ -127,6 +138,8 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // Do something when error occurred
+                        retry.setVisibility(View.VISIBLE);
+                        Log.e("r", error.toString());
                         Snackbar.make(
                                 coordinatorLayout,
                                 "Error fetching JSON",
