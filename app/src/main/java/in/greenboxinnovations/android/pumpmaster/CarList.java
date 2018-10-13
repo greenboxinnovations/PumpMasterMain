@@ -45,6 +45,7 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
     private int car_id = -1;
     private static final int SCAN_QR_CODE_INTENT = 107;
     private ProgressBar progressBar;
+    private boolean inProcess = false;
 
 
     @Override
@@ -167,7 +168,10 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
                 Log.e("car_qr_code", "" + val);
-                postCode(val);
+
+                if(!inProcess){
+                    postCode(val);
+                }
             }
         }
     }
@@ -208,6 +212,9 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
 
     private void postCode(String qr_code) {
+
+        inProcess = true;
+
         progressBar.setVisibility(View.VISIBLE);
 
         String url = getResources().getString(R.string.url_hosted);
@@ -229,6 +236,8 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         }
         Log.e("post qr details", jsonObj.toString());
 
+
+
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                 url, jsonObj,
                 new Response.Listener<JSONObject>() {
@@ -239,18 +248,22 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
                         progressBar.setVisibility(View.INVISIBLE);
 
+
                         try {
                             if (response.getBoolean("success")) {
                                 Log.e("result", "success");
 
                                 showDialog(response.getString("msg"));
 
+
                             } else {
                                 Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        inProcess = false;
                     }
                 }, new Response.ErrorListener() {
 
@@ -259,6 +272,7 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
                 Log.e("Volley Error", "Error: " + error.getMessage());
                 Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.INVISIBLE);
+                inProcess = false;
             }
         }) {
 
@@ -271,7 +285,5 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
             }
         };
         MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
-
-
     }
 }

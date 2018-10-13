@@ -124,8 +124,6 @@ public class NewTransaction extends AppCompatActivity {
                     click = true;
                     newTransaction();
                 }
-
-
             }
         });
     }
@@ -287,14 +285,21 @@ public class NewTransaction extends AppCompatActivity {
             Snackbar.make(coordinatorLayout, "Empty Values Not Allowed", Snackbar.LENGTH_SHORT).show();
             click = false;
         } else {
-            Double maxValueAmount = Double.valueOf(fuel_rs);
-            Double maxValueLit = Double.valueOf(fuel_lit);
-            if ((maxValueAmount > 99999.99)||(maxValueLit >999.99)){
-                Snackbar.make(coordinatorLayout, "Amount has to be less than 99999.99 or lit less than 999.99", Snackbar.LENGTH_SHORT).show();
+            try {
+                Double maxValueAmount = Double.valueOf(fuel_rs);
+                Double maxValueLit = Double.valueOf(fuel_lit);
+                if ((maxValueAmount > 99999.99)||(maxValueLit >999.99)){
+                    Snackbar.make(coordinatorLayout, "Amount has to be less than 99999.99 or lit less than 999.99", Snackbar.LENGTH_SHORT).show();
+                    click = false;
+                }else{
+                    sendData(fuel_rs, fuel_lit);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+                Snackbar.make(coordinatorLayout, "Invalid Amount", Snackbar.LENGTH_SHORT).show();
                 click = false;
-            }else{
-                sendData(fuel_rs, fuel_lit);
             }
+
 
         }
     }
@@ -398,15 +403,21 @@ public class NewTransaction extends AppCompatActivity {
                     if (!keyLock) {
                         keyLock = true;
                         if (!text.equals("")) {
-                            double litVal = Double.parseDouble(text);
-                            double pre_rsVal;
-                            if (isPetrol) {
-                                pre_rsVal = litVal * p_rate;
-                            } else {
-                                pre_rsVal = litVal * d_rate;
+
+                            try {
+                                double litVal = Double.parseDouble(text);
+                                double pre_rsVal;
+                                if (isPetrol) {
+                                    pre_rsVal = litVal * p_rate;
+                                } else {
+                                    pre_rsVal = litVal * d_rate;
+                                }
+                                double rsVal = round(pre_rsVal, 2);
+                                et_fuel_rs.setText(String.valueOf(rsVal));
+                            }catch (Exception e){
+                                e.printStackTrace();
                             }
-                            double rsVal = round(pre_rsVal, 2);
-                            et_fuel_rs.setText(String.valueOf(rsVal));
+
 
                         } else {
                             et_fuel_rs.setText("");
@@ -419,15 +430,20 @@ public class NewTransaction extends AppCompatActivity {
                     if (!keyLock) {
                         keyLock = true;
                         if (!text.equals("")) {
-                            double rsVal = Double.parseDouble(text);
-                            double pre_litVal;
-                            if (isPetrol) {
-                                pre_litVal = rsVal / p_rate;
-                            } else {
-                                pre_litVal = rsVal / d_rate;
+
+                            try {
+                                double rsVal = Double.parseDouble(text);
+                                double pre_litVal;
+                                if (isPetrol) {
+                                    pre_litVal = rsVal / p_rate;
+                                } else {
+                                    pre_litVal = rsVal / d_rate;
+                                }
+                                double litVal = round(pre_litVal, 2);
+                                et_fuel_litres.setText(String.valueOf(litVal));
+                            }catch (Exception e){
+                                e.printStackTrace();
                             }
-                            double litVal = round(pre_litVal, 2);
-                            et_fuel_litres.setText(String.valueOf(litVal));
 
                         } else {
                             et_fuel_litres.setText("");
