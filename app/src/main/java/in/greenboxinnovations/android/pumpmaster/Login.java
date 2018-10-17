@@ -123,7 +123,10 @@ public class Login extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.add_car_qr_new) {
-          showDialog_pass();
+            showDialog_pass(0);
+        }
+        if (item.getItemId() == R.id.add_new_rate) {
+            showDialog_pass(1);
         }
 
         return super.onOptionsItemSelected(item);
@@ -354,7 +357,7 @@ public class Login extends AppCompatActivity {
 
     }
 
-    private void showDialog_pass() {
+    private void showDialog_pass(final int i) {
 
         final EditText input = new EditText(this);
 
@@ -370,8 +373,14 @@ public class Login extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         int val = Integer.valueOf(String.valueOf(input.getText()));
                         if (val == 124578){
-                            Intent i = new Intent(getApplicationContext(), AddQRCode.class);
-                            startActivity(i);
+                            if (i == 0){
+                                Intent i = new Intent(getApplicationContext(), AddQRCode.class);
+                                startActivity(i);
+                            }else if(i == 1){
+                                Intent i = new Intent(getApplicationContext(), SetRates.class);
+                                startActivity(i);
+                            }
+
                         }else{
                             Snackbar.make(coordinatorLayout, "Access Denied", Snackbar.LENGTH_SHORT).show();
                         }

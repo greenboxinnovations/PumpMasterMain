@@ -15,5 +15,6 @@
     <string name="title_activity_car_list">CarList</string>
     <string name="add_car_qr_code">Add Car / QR Code</string>
     <string name="logout">Logout</string>
+    <string name="new_rate">New Rate</string>
 
 </resources>

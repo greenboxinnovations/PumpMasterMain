@@ -84,6 +84,8 @@ public class SetRates extends AppCompatActivity {
 
     private void setRates() {
 
+        Boolean check = false;
+
         // hide keyboard on submit
         View view = this.getCurrentFocus();
         if (view != null) {
@@ -98,76 +100,89 @@ public class SetRates extends AppCompatActivity {
         if (p_string.matches("") || d_string.matches("")) {
             Snackbar.make(coordinatorLayout, "Please Enter Both Rates", Snackbar.LENGTH_SHORT).show();
         } else {
+
+            double p_rate = 0;
+            double d_rate = 0;
+            try {
+
+                p_rate = Double.parseDouble(p_string);
+                d_rate = Double.parseDouble(d_string);
+
+                Log.e("r", "" + p_rate);
+                Log.e("r", "" + d_rate);
+
+                check = true;
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
             // check if number is too large
-            double p_rate = Double.parseDouble(p_string);
-            double d_rate = Double.parseDouble(d_string);
+            if (check) {
 
-            Log.e("r", "" + p_rate);
-            Log.e("r", "" + d_rate);
+                if ((p_rate < 1 || p_rate > 140) || (d_rate < 1 || d_rate > 140)) {
+                    Snackbar.make(coordinatorLayout, "Invalid Rate", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    // jsonObj
+                    JSONObject jsonObj = new JSONObject();
+                    try {
+                        jsonObj.put("petrol", p_rate);
+                        jsonObj.put("diesel", d_rate);
+                        jsonObj.put("pump_id", "1");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-            if ((p_rate < 1 || p_rate > 140) || (d_rate < 1 || d_rate > 140)) {
-                Snackbar.make(coordinatorLayout, "Invalid Rate", Snackbar.LENGTH_SHORT).show();
-            } else {
-                // jsonObj
-                JSONObject jsonObj = new JSONObject();
-                try {
-                    jsonObj.put("petrol", p_rate);
-                    jsonObj.put("diesel", d_rate);
-                    jsonObj.put("pump_id", "1");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    // volley
+                    JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                            url, jsonObj,
+                            new Response.Listener<JSONObject>() {
 
-                // volley
-                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                        url, jsonObj,
-                        new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    Log.e("login response", response.toString());
 
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Log.e("login response", response.toString());
-
-                                try {
-                                    if (response.getBoolean("success")) {
-                                        String msg = response.getString("msg");
-                                        Snackbar.make(coordinatorLayout, msg, Snackbar.LENGTH_SHORT).show();
+                                    try {
+                                        if (response.getBoolean("success")) {
+                                            String msg = response.getString("msg");
+                                            Snackbar.make(coordinatorLayout, msg, Snackbar.LENGTH_SHORT).show();
 
 
 //                                        Intent i = new Intent(getApplicationContext(), Login.class);
 //                                        startActivity(i);
 //                                        finish();
-                                        logUserFromRates();
-                                    } else {
-                                        Log.e("result", "fail");
-                                        String msg = response.getString("msg");
-                                        Snackbar.make(coordinatorLayout, msg, Snackbar.LENGTH_SHORT).show();
+                                            logUserFromRates();
+                                        } else {
+                                            Log.e("result", "fail");
+                                            String msg = response.getString("msg");
+                                            Snackbar.make(coordinatorLayout, msg, Snackbar.LENGTH_SHORT).show();
 //                                        sharedPrefs.edit()
 //                                                .putInt("user_id", -1)
 //                                                .putInt("pump_id", -1)
 //                                                .apply();
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
                                 }
-                            }
-                        }, new Response.ErrorListener() {
+                            }, new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("Volley Error", "Error: " + error.getMessage());
-                        Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
-                    }
-                }) {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e("Volley Error", "Error: " + error.getMessage());
+                            Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
+                        }
+                    }) {
 
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        HashMap<String, String> headers = new HashMap<>();
-                        headers.put("Content-Type", "application/json");
-                        headers.put("charset", "utf-8");
-                        return headers;
-                    }
-                };
-                MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            HashMap<String, String> headers = new HashMap<>();
+                            headers.put("Content-Type", "application/json");
+                            headers.put("charset", "utf-8");
+                            return headers;
+                        }
+                    };
+                    MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+                }
             }
         }
     }
