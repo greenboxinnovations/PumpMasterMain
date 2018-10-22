@@ -355,6 +355,9 @@ public class Login extends AppCompatActivity {
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         dialog.show();
 
+        input.setFocusableInTouchMode(true);
+        input.requestFocus();
+
     }
 
     private void showDialog_pass(final int i) {
