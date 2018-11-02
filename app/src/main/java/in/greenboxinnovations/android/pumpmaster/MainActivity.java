@@ -226,13 +226,27 @@ public class MainActivity extends AppCompatActivity {
 
                                     jsonObject = response;
                                     car_id = response.getInt("car_id");
-                                    Intent scan = new Intent(getApplicationContext(), Scan.class);
-                                    scan.putExtra("title", "Scan Pump");
-                                    startActivityForResult(scan, 101);
+
+                                    final AlertDialog.Builder builder =
+                                        new AlertDialog.Builder(MainActivity.this).
+                                            setMessage("Scan Pump Now").
+                                            setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                    if (vibe != null) {
+                                                        vibe.vibrate(50);
+                                                    }
+                                                    Intent scan = new Intent(getApplicationContext(), Scan.class);
+                                                    scan.putExtra("title", "Scan Pump");
+                                                    startActivityForResult(scan, 101);
+                                                }
+                                            });
+                                    builder.create().show();
 
                                 } else {
                                     Log.e("result", "fail");
-                                    Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

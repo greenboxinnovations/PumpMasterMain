@@ -20,7 +20,9 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -31,6 +33,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -40,8 +43,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.fabric.sdk.android.Fabric;
+
 public class NewTransaction extends AppCompatActivity {
 
+    private static final String APP_SHARED_PREFS = "prefs";
+    boolean keyLock = false;
     private double p_rate = -1;
     private double d_rate = -1;
     private TextView fuel_type, fuel_rate, tv_car_no_plate, tv_cust_name;
@@ -49,16 +56,87 @@ public class NewTransaction extends AppCompatActivity {
     private FloatingActionButton b_new_transaction;
     private boolean isPetrol, complete = false;
     private CoordinatorLayout coordinatorLayout;
-    boolean keyLock = false;
     private RelativeLayout rl_back;
     private int car_id, cust_id, user_id, pump_id;
     private String shift, pump_code, cust_name, car_no;
-
     private File outputFile;
     private boolean isWiFiEnabled, click = false;
-
-    private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
+    public static Bitmap decodeSampledBitmapFromResource(File file, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getPath(), options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(file.getPath(), options);
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        switch (requestCode) {
+//
+//            case 100:
+//                if (resultCode == RESULT_OK) {
+//                    //sendFile(outputFile);
+//                    Log.e("photo", "send");
+//
+//                    Bitmap bitmap = decodeSampledBitmapFromResource(outputFile, 640, 480);
+//
+//                    try {
+//                        FileOutputStream out = new FileOutputStream(outputFile);
+//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out);
+//                        out.flush();
+//                        out.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    if (!isMyServiceRunning(UploadService.class)) {
+//                        Intent i = new Intent(getApplication(), UploadService.class);
+//                        startService(i);
+//                        finish();
+//                    }
+//                } else if (resultCode == RESULT_CANCELED) {
+//                    clickPhoto();
+//                } else {
+//                    Log.e("photo result", "else");
+//                }
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +146,8 @@ public class NewTransaction extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         init();
+
+//        enableDebugMode();
 
         pump_code = getIntent().getStringExtra("pump_code");
 
@@ -127,8 +207,6 @@ public class NewTransaction extends AppCompatActivity {
             }
         });
     }
-
-
 
     private void init() {
 
@@ -235,38 +313,6 @@ public class NewTransaction extends AppCompatActivity {
 
 
     }
-
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//
-//            case 100:
-//                if (resultCode == RESULT_OK) {
-//                    //sendFile(outputFile);
-//                    Log.e("photo", "send");
-//
-//                    Bitmap bitmap = decodeSampledBitmapFromResource(outputFile, 640, 480);
-//
-//                    try {
-//                        FileOutputStream out = new FileOutputStream(outputFile);
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out);
-//                        out.flush();
-//                        out.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    if (!isMyServiceRunning(UploadService.class)) {
-//                        Intent i = new Intent(getApplication(), UploadService.class);
-//                        startService(i);
-//                        finish();
-//                    }
-//                } else if (resultCode == RESULT_CANCELED) {
-//                    clickPhoto();
-//                } else {
-//                    Log.e("photo result", "else");
-//                }
-//        }
-//    }
 
     private void newTransaction() {
 
@@ -382,6 +428,16 @@ public class NewTransaction extends AppCompatActivity {
 //        super.onBackPressed();
     }
 
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class GenericTextWatcher implements TextWatcher {
 
         private View view;
@@ -455,58 +511,89 @@ public class NewTransaction extends AppCompatActivity {
         }
     }
 
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-        long factor = (long) Math.pow(10, places);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
-    }
-
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Bitmap decodeSampledBitmapFromResource(File file, int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getPath(), options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(file.getPath(), options);
-    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-        return inSampleSize;
-    }
-
+//    public void setKeysBasic(String key) {
+//        // [START crash_set_keys_basic]
+//        Crashlytics.setString(key, "foo" /* string value */);
+//
+//        Crashlytics.setBool(key, true /* boolean value */);
+//
+//        Crashlytics.setDouble(key, 1.0 /* double value */);
+//
+//        Crashlytics.setFloat(key, 1.0f /* float value */);
+//
+//        Crashlytics.setInt(key, 1 /* int value */);
+//        // [END crash_set_keys_basic]
+//    }
+//
+//    public void resetKey() {
+//        // [START crash_re_set_key]
+//        Crashlytics.setInt("current_level", 3);
+//        Crashlytics.setString("last_UI_action", "logged_in");
+//        // [END crash_re_set_key]
+//    }
+//
+//    public void logReportAndPrint() {
+//        // [START crash_log_report_and_print]
+//        Crashlytics.log(Log.DEBUG, "tag", "message");
+//        // [END crash_log_report_and_print]
+//    }
+//
+//    public void logReportOnly() {
+//        // [START crash_log_report_only]
+//        Crashlytics.log("message");
+//        // [END crash_log_report_only]
+//    }
+//
+//    public void enableAtRuntime() {
+//        // [START crash_enable_at_runtime]
+//        Fabric.with(this, new Crashlytics());
+//        // [END crash_enable_at_runtime]
+//    }
+//
+//    public void setUserId() {
+//        // [START crash_set_user_id]
+//        Crashlytics.setUserIdentifier("user123456789");
+//        // [END crash_set_user_id]
+//    }
+//
+//    public void methodThatThrows() throws Exception {
+//        throw new Exception();
+//    }
+//
+//    public void logCaughtEx() {
+//        // [START crash_log_caught_ex]
+//        try {
+//            methodThatThrows();
+//        } catch (Exception e) {
+//            Crashlytics.logException(e);
+//            // handle your exception here
+//        }
+//        // [END crash_log_caught_ex]
+//    }
+//
+//    public void enableDebugMode() {
+//        // [START crash_enable_debug_mode]
+//        final Fabric fabric = new Fabric.Builder(this)
+//                .kits(new Crashlytics())
+//                .debuggable(true)  // Enables Crashlytics debugger
+//                .build();
+//        Fabric.with(fabric);
+//        // [END crash_enable_debug_mode]
+//    }
+//
+//    public void forceACrash() {
+//        // [START crash_force_crash]
+//        Button crashButton = new Button(this);
+//        crashButton.setText("Crash!");
+//        crashButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                Crashlytics.getInstance().crash(); // Force a crash
+//            }
+//        });
+//
+//        addContentView(crashButton, new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        // [END crash_force_crash]
+//    }
 }
