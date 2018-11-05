@@ -20,9 +20,7 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -33,7 +31,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.crashlytics.android.Crashlytics;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -42,8 +39,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.fabric.sdk.android.Fabric;
 
 public class NewTransaction extends AppCompatActivity {
 
@@ -392,8 +387,24 @@ public class NewTransaction extends AppCompatActivity {
                                     clickPhoto();
                                 } else {
                                     Log.e("result", "fail");
-                                    Snackbar.make(coordinatorLayout, "Invalid Code", Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
                                     click = false;
+                                    if (response.getString("msg").equals("Duplicate Entry")){
+                                        final AlertDialog.Builder builder =
+                                            new AlertDialog.Builder(NewTransaction.this).
+                                                setMessage("This Is A Duplicate Transaction").
+                                                setPositiveButton("Finish", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                        if (vibe != null) {
+                                                            vibe.vibrate(50);
+                                                        }
+                                                        finish();
+                                                    }
+                                                });
+                                        builder.create().show();
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
