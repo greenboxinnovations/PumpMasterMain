@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 String val = barcode.displayValue;
                 Log.e("pump_qr_code", "" + val);
                 pump_code = val;
-                if ((val.equals("8FuAVN303E"))||(val.equals("4xzliayQPL"))){
+                if ((val.equals("8FuAVN303E"))||(val.equals("4xzliayQPL"))||(val.equals("asdfg12345"))||(val.equals("12345asdfg"))){
                     snapZeroPhoto(jsonObject, val);
                 }
             }
