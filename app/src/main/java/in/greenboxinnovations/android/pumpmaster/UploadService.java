@@ -98,7 +98,7 @@ public class UploadService extends Service implements AysncInterface{
         isProcessingPhotos = true;
         try {
 
-            String url_photos = url_main + "/savetofile.php";
+            String url_photos = url_main + "/exe/save_android_photos.php";
             URL connectURL = new URL(url_photos);
             HttpFileUpload httpFileUpload = new HttpFileUpload(connectURL, file, this);
             httpFileUpload.execute();

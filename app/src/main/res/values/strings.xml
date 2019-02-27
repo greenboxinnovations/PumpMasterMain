@@ -1,15 +1,28 @@
 <resources>
     <string name="app_name">Pump Master</string>
-    <string name="url_main">http://192.168.0.100/pump_master</string>
-    <string name="url_hosted">http://fuelmaster.greenboxinnovations.in</string>
+
+    <!--LIVE COPY-->
+    <!--<string name="url_main">http://192.168.0.100/pump_master</string>-->
+    <!--<string name="url_hosted">http://fuelmaster.greenboxinnovations.in</string>-->
+    <!--<string name="url_add_customer">http://fuelmaster.greenboxinnovations.in/api/customers</string>-->
+    <!--<string name="url_add_customer_car">http://fuelmaster.greenboxinnovations.in/api/cars</string>-->
+
+    <!--DEV-->
+    <string name="url_main">http://192.168.0.100/</string>
+    <string name="url_hosted">http://fueltest.greenboxinnovations.in</string>
+    <string name="url_add_customer">http://fueltest.greenboxinnovations.in/api/customers</string>
+    <string name="url_add_customer_car">http://fueltest.greenboxinnovations.in/api/cars</string>
+
+
     <string name="url_app">http://192.168.0.100/pump_master/app/download.php?app_name=operator</string>
     <string name="url_check_version">http://192.168.0.100/pump_master/exe/check_version.php</string>
+
+
     <!--<string name="url_app">http://fuelmaster.greenboxinnovations.in/app/download.php?app_name=operator</string>-->
     <!--<string name="url_login">http://fuelmaster.greenboxinnovations.in/exe/login_and.php</string>-->
     <!--<string name="url_check_version">http://fuelmaster.greenboxinnovations.in/exe/check_version.php</string>-->
     <string name="app_version">1</string>
-    <string name="url_add_customer">http://fuelmaster.greenboxinnovations.in/api/customers</string>
-    <string name="url_add_customer_car">http://fuelmaster.greenboxinnovations.in/api/cars</string>
+
     <string name="title_activity_new_transaction">New Transaction</string>
     <string name="title_activity_add_qrcode">AddQRCode</string>
     <string name="title_activity_car_list">CarList</string>
