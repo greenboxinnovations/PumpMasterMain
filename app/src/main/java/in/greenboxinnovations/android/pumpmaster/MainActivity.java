@@ -48,8 +48,11 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefs;
     private JSONObject jsonObject;
     private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
-    private int car_id;
+    private int car_id, receipt_number = 0;
     private String pump_code;
+    private static final int SCAN_CAR = 100;
+    private static final int SCAN_PUMP = 101;
+    private static final int ADD_CAR = 102;
 
 
     @Override
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         coordinatorLayout = findViewById(R.id.activity_main_layout);
         sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
+
 
         init();
         car_id = 0;
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100 && resultCode == RESULT_OK) {
+        if (requestCode == SCAN_CAR && resultCode == RESULT_OK) {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 String val = barcode.displayValue;
@@ -132,20 +136,41 @@ public class MainActivity extends AppCompatActivity {
                 isCodeValid(val);
             }
         }
-        if (requestCode == 101 && resultCode == RESULT_OK) {
+        if (requestCode == SCAN_PUMP && resultCode == RESULT_OK) {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
 
                 String val = barcode.displayValue;
                 Log.e("pump_qr_code", "" + val);
                 pump_code = val;
-                if ((val.equals("8FuAVN303E"))||(val.equals("4xzliayQPL"))||(val.equals("asdfg12345"))||(val.equals("12345asdfg"))){
-                    snapZeroPhoto(jsonObject, val);
+                if ((val.equals("8FuAVN303E")) || (val.equals("4xzliayQPL")) || (val.equals("asdfg12345")) || (val.equals("12345asdfg"))) {
+                    snapZeroPhoto(val);
                 }
             }
         }
-    }
 
+        if (requestCode == ADD_CAR && resultCode == RESULT_OK) {
+            if (data != null) {
+//                String val = data.getParcelableExtra("stuff");
+                int car_id = data.getIntExtra("car_id", -1);
+                String car_no = data.getStringExtra("car_no");
+                Boolean isPetrol = data.getBooleanExtra("isPetrol", false);
+                try {
+                    jsonObject.put("car_id", car_id);
+                    jsonObject.put("car_no", car_no);
+                    jsonObject.put("isPetrol", isPetrol);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("ad", e.getMessage());
+                }
+                Log.e("json", jsonObject.toString());
+                // scan pump now
+                Intent scan = new Intent(getApplicationContext(), Scan.class);
+                scan.putExtra("title", "Scan Pump");
+                startActivityForResult(scan, SCAN_PUMP);
+            }
+        }
+    }
 
     // Ensure the right menu is setup
     @Override
@@ -162,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.add_car_qr) {
             Intent i = new Intent(getApplicationContext(), AddQRCode.class);
             startActivity(i);
+        }
+        if (item.getItemId() == R.id.enter_receipt) {
+            showDialog();
         }
         if (item.getItemId() == R.id.logout) {
             sharedPrefs.edit().clear().apply();
@@ -181,20 +209,21 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Enter receipt no")
-//                .setMessage("What do you want to do next?")
                 .setView(input)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String val = String.valueOf(input.getText());
-                        Log.e("receipt no entered", val);
+
+                        String text = input.getText().toString();
+                        if (!text.equals("")) {
+                            isReceiptInLocalDB(text);
+                        }
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .create();
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         dialog.show();
-
     }
 
     //local network check
@@ -228,20 +257,20 @@ public class MainActivity extends AppCompatActivity {
                                     car_id = response.getInt("car_id");
 
                                     final AlertDialog.Builder builder =
-                                        new AlertDialog.Builder(MainActivity.this).
-                                            setMessage("Scan Pump Now").
-                                            setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                                    if (vibe != null) {
-                                                        vibe.vibrate(50);
-                                                    }
-                                                    Intent scan = new Intent(getApplicationContext(), Scan.class);
-                                                    scan.putExtra("title", "Scan Pump");
-                                                    startActivityForResult(scan, 101);
-                                                }
-                                            });
+                                            new AlertDialog.Builder(MainActivity.this).
+                                                    setMessage("Scan Pump Now").
+                                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                            if (vibe != null) {
+                                                                vibe.vibrate(50);
+                                                            }
+                                                            Intent scan = new Intent(getApplicationContext(), Scan.class);
+                                                            scan.putExtra("title", "Scan Pump");
+                                                            startActivityForResult(scan, SCAN_PUMP);
+                                                        }
+                                                    });
                                     builder.create().show();
 
                                 } else {
@@ -276,10 +305,73 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void snapZeroPhoto(JSONObject json, final String val) {
+    private void isReceiptValid(final String val) {
+        if (isWiFiEnabled) {
+
+            String url = getResources().getString(R.string.url_hosted);
+
+            url = url + "/exe/check_receipt.php";
+
+            Log.e("login response", url);
+
+            final JSONObject jsonObj = new JSONObject();
+            try {
+                jsonObj.put("rnum", val);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObj,
+                    new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("login response", response.toString());
+                            try {
+                                if (response.getBoolean("success")) {
+                                    jsonObject = response;
+                                    Log.e("json", jsonObject.toString());
+                                    receipt_number = Integer.valueOf(val);
+                                    Intent i = new Intent(getApplicationContext(), AddNewCar.class);
+                                    i.putExtra("isReceipt", true);
+                                    i.putExtra("cust_id", jsonObject.getInt("cust_id"));
+                                    i.putExtra("cust_name", jsonObject.getString("cust_name"));
+                                    startActivityForResult(i, ADD_CAR);
+                                } else {
+                                    Log.e("result", "fail");
+                                    Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Volley Error", "Error: " + error.getMessage());
+                    Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("charset", "utf-8");
+                    return headers;
+                }
+            };
+            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+
+        } else {
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void snapZeroPhoto(final String val) {
         if (isWiFiEnabled) {
             final String url1 = getResources().getString(R.string.url_main);
-
             final String url = url1 + "/exe/snap_photo.php";
 
             JSONObject jsonObj = new JSONObject();
@@ -287,7 +379,6 @@ public class MainActivity extends AppCompatActivity {
                 jsonObj.put("photo_type", "start");
                 jsonObj.put("car_id", car_id);
                 jsonObj.put("pump_code", pump_code);
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -303,11 +394,8 @@ public class MainActivity extends AppCompatActivity {
                                 if (response.getBoolean("success")) {
                                     //get photo url as response and display here
                                     String photo_url = response.getString("photo_url");
-
                                     String url_photo = url1 + "/" + photo_url;
-
                                     ImageView image = new ImageView(MainActivity.this);
-
                                     Picasso.get().load(url_photo).into(image);
 
                                     final AlertDialog.Builder builder =
@@ -321,6 +409,11 @@ public class MainActivity extends AppCompatActivity {
                                                                 vibe.vibrate(50);
                                                             }
                                                             Intent i = new Intent(getApplicationContext(), NewTransaction.class);
+                                                            try {
+                                                                jsonObject.put("receipt_number", receipt_number);
+                                                            } catch (JSONException e) {
+                                                                e.printStackTrace();
+                                                            }
                                                             i.putExtra("jsonObject", jsonObject.toString());
                                                             i.putExtra("pump_code", val);
                                                             startActivity(i);
@@ -336,7 +429,6 @@ public class MainActivity extends AppCompatActivity {
                                     builder.create().show();
 
                                 } else {
-
                                     Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
@@ -353,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
             }) {
 
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json");
                     headers.put("charset", "utf-8");
@@ -367,4 +459,61 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private void isReceiptInLocalDB(final String val) {
+        if (isWiFiEnabled) {
+
+            String url = getResources().getString(R.string.url_main);
+
+            url = url + "/exe/check_receipt_local.php";
+
+            Log.e("login response", url);
+
+            final JSONObject jsonObj = new JSONObject();
+            try {
+                jsonObj.put("rnum", val);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObj,
+                    new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("login response", response.toString());
+                            try {
+                                if (response.getBoolean("success")) {
+                                    isReceiptValid(val);
+                                } else {
+                                    Log.e("result", "fail");
+                                    Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Volley Error", "Error: " + error.getMessage());
+                    Snackbar.make(coordinatorLayout, "Network Error", Snackbar.LENGTH_LONG).show();
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("charset", "utf-8");
+                    return headers;
+                }
+            };
+            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+
+        } else {
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+        }
+    }
 }

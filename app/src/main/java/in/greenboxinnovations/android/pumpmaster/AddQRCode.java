@@ -98,7 +98,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
                         mAdapter.notifyDataSetChanged();
 
 
-                        Log.e("resp", response.toString());
+//                        Log.e("resp", response.toString());
 
                         try {
                             for (int i = 0; i < response.length(); i++) {
@@ -159,9 +159,7 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
             Intent i = new Intent(getApplicationContext(), AddNewCustomer.class);
             startActivity(i);
         } else {
-
             Intent i = new Intent(getApplicationContext(), CarList.class);
-
             i.putExtra("cust_id", cust_id);
             startActivity(i);
         }

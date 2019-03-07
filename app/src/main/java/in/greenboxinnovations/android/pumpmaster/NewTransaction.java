@@ -46,14 +46,14 @@ public class NewTransaction extends AppCompatActivity {
     boolean keyLock = false;
     private double p_rate = -1;
     private double d_rate = -1;
-    private TextView fuel_type, fuel_rate, tv_car_no_plate, tv_cust_name;
+    private TextView fuel_type, fuel_rate, tv_car_no_plate, tv_cust_name, tv_low_alert;
     private EditText et_fuel_litres, et_fuel_rs;
     private FloatingActionButton b_new_transaction;
     private boolean isPetrol, complete = false;
     private CoordinatorLayout coordinatorLayout;
     private RelativeLayout rl_back;
     private int car_id, cust_id, user_id, pump_id;
-    private String shift, pump_code, cust_name, car_no;
+    private String shift, pump_code, cust_name, car_no, low_alert, receipt_number;
     private File outputFile;
     private boolean isWiFiEnabled, click = false;
     private SharedPreferences sharedPrefs;
@@ -101,37 +101,6 @@ public class NewTransaction extends AppCompatActivity {
         return inSampleSize;
     }
 
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//
-//            case 100:
-//                if (resultCode == RESULT_OK) {
-//                    //sendFile(outputFile);
-//                    Log.e("photo", "send");
-//
-//                    Bitmap bitmap = decodeSampledBitmapFromResource(outputFile, 640, 480);
-//
-//                    try {
-//                        FileOutputStream out = new FileOutputStream(outputFile);
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out);
-//                        out.flush();
-//                        out.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    if (!isMyServiceRunning(UploadService.class)) {
-//                        Intent i = new Intent(getApplication(), UploadService.class);
-//                        startService(i);
-//                        finish();
-//                    }
-//                } else if (resultCode == RESULT_CANCELED) {
-//                    clickPhoto();
-//                } else {
-//                    Log.e("photo result", "else");
-//                }
-//        }
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +114,8 @@ public class NewTransaction extends AppCompatActivity {
 //        enableDebugMode();
 
         pump_code = getIntent().getStringExtra("pump_code");
+
+        Log.e("asd", "" + pump_code);
 
         p_rate = Double.valueOf(sharedPrefs.getString("petrol_rate", "-1"));
         d_rate = Double.valueOf(sharedPrefs.getString("diesel_rate", "-1"));
@@ -160,14 +131,26 @@ public class NewTransaction extends AppCompatActivity {
             car_id = jsonObj.getInt("car_id");
             cust_id = jsonObj.getInt("cust_id");
             cust_name = jsonObj.getString("cust_name");
+            receipt_number = jsonObj.getString("receipt_number");
             car_no = jsonObj.getString("car_no");
+            tv_car_no_plate.setText(car_no);
+            tv_cust_name.setText(cust_name);
+            Log.e("asd", "" + receipt_number);
+
+            if (jsonObj.getBoolean("alert")) {
+                tv_low_alert.setVisibility(View.VISIBLE);
+                String alert = "Low Balance : " + jsonObj.getString("alert_value");
+                tv_low_alert.setText(alert);
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.e("errer", e.getMessage());
         }
 
 
-        tv_car_no_plate.setText(car_no);
-        tv_cust_name.setText(cust_name);
+//        tv_car_no_plate.setText(car_no);
+//        tv_cust_name.setText(cust_name);
 
 
         if (isPetrol) {
@@ -217,6 +200,7 @@ public class NewTransaction extends AppCompatActivity {
 
         tv_car_no_plate = findViewById(R.id.tv_car_no_plate);
         tv_cust_name = findViewById(R.id.tv_cust_name);
+        tv_low_alert = findViewById(R.id.tv_low_alert);
 
         et_fuel_rs = findViewById(R.id.et_rs);
         b_new_transaction = findViewById(R.id.b_new_transaction);
@@ -329,13 +313,13 @@ public class NewTransaction extends AppCompatActivity {
             try {
                 Double maxValueAmount = Double.valueOf(fuel_rs);
                 Double maxValueLit = Double.valueOf(fuel_lit);
-                if ((maxValueAmount > 99999.99)||(maxValueLit >999.99)){
+                if ((maxValueAmount > 99999.99) || (maxValueLit > 999.99)) {
                     Snackbar.make(coordinatorLayout, "Amount has to be less than 99999.99 or lit less than 999.99", Snackbar.LENGTH_SHORT).show();
                     click = false;
-                }else{
+                } else {
                     sendData(fuel_rs, fuel_lit);
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 Snackbar.make(coordinatorLayout, "Invalid Amount", Snackbar.LENGTH_SHORT).show();
                 click = false;
@@ -365,12 +349,14 @@ public class NewTransaction extends AppCompatActivity {
                 jsonObj.put("liters", fuel_lit);
                 jsonObj.put("cust_id", cust_id);
                 jsonObj.put("user_id", user_id);
+                jsonObj.put("receipt_no", receipt_number);
                 jsonObj.put("pump_code", pump_code);
                 jsonObj.put("shift", shift);
                 jsonObj.put("pump_id", pump_id);
 
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.e("error", e.getMessage());
             }
 
             Log.e("Json Object", "obj" + jsonObj.toString());
@@ -389,20 +375,20 @@ public class NewTransaction extends AppCompatActivity {
                                     Log.e("result", "fail");
                                     Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
                                     click = false;
-                                    if (response.getString("msg").equals("Duplicate Entry")){
+                                    if (response.getString("msg").equals("Duplicate Entry")) {
                                         final AlertDialog.Builder builder =
-                                            new AlertDialog.Builder(NewTransaction.this).
-                                                setMessage("This Is A Duplicate Transaction").
-                                                setPositiveButton("Finish", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                                        if (vibe != null) {
-                                                            vibe.vibrate(50);
-                                                        }
-                                                        finish();
-                                                    }
-                                                });
+                                                new AlertDialog.Builder(NewTransaction.this).
+                                                        setMessage("This Is A Duplicate Transaction").
+                                                        setPositiveButton("Finish", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                                if (vibe != null) {
+                                                                    vibe.vibrate(50);
+                                                                }
+                                                                finish();
+                                                            }
+                                                        });
                                         builder.create().show();
                                     }
                                 }
@@ -430,7 +416,6 @@ public class NewTransaction extends AppCompatActivity {
                 }
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
-
         }
     }
 
@@ -481,7 +466,7 @@ public class NewTransaction extends AppCompatActivity {
                                 }
                                 double rsVal = round(pre_rsVal, 2);
                                 et_fuel_rs.setText(String.valueOf(rsVal));
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
@@ -508,7 +493,7 @@ public class NewTransaction extends AppCompatActivity {
                                 }
                                 double litVal = round(pre_litVal, 2);
                                 et_fuel_litres.setText(String.valueOf(litVal));
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 

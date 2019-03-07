@@ -29,5 +29,6 @@
     <string name="add_car_qr_code">Add Car / QR Code</string>
     <string name="logout">Logout</string>
     <string name="new_rate">New Rate</string>
+    <string name="receipt_entry">Receipt Entry</string>
 
 </resources>
