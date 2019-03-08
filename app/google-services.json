@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "772252405994",
+    "firebase_url": "https://pumpmastermain.firebaseio.com",
+    "project_id": "pumpmastermain",
+    "storage_bucket": "pumpmastermain.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:772252405994:android:4f3319254b49e41b",
+        "android_client_info": {
+          "package_name": "in.greenboxinnovations.android.pumpmaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "772252405994-2tin3nlomfj50gcg6sabe5c5vjin231v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.greenboxinnovations.android.pumpmaster",
+            "certificate_hash": "1ba55286c799d1527139745f6bf8ed1e7e65ebf0"
+          }
+        },
+        {
+          "client_id": "772252405994-upjs6edib5r8ke0gu1374vn44cd3msr7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn7HXEagUaN3i8wA_3Tx3UJD4Ii6oxYVw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "772252405994-upjs6edib5r8ke0gu1374vn44cd3msr7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

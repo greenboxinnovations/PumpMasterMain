@@ -43,6 +43,7 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
     private ArrayList<POJO_id_string> carList = new ArrayList<>();
     private int cust_id = -1;
     private int car_id = -1;
+    private String cust_name = "";
     private static final int SCAN_QR_CODE_INTENT = 107;
     private ProgressBar progressBar;
     private boolean inProcess = false;
@@ -57,7 +58,6 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
 
         getBundle(savedInstanceState);
         init();
-
 
 
     }
@@ -91,9 +91,12 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
                 cust_id = -1;
             } else {
                 cust_id = extras.getInt("cust_id");
+                cust_name = extras.getString("cust_name");
+
             }
         } else {
             cust_id = (int) savedInstanceState.getSerializable("cust_id");
+            cust_name = (String) savedInstanceState.getSerializable("cust_name");
         }
 
         Log.e("tag", " " + cust_id);
@@ -169,7 +172,7 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
                 String val = barcode.displayValue;
                 Log.e("car_qr_code", "" + val);
 
-                if(!inProcess){
+                if (!inProcess) {
                     postCode(val);
                 }
             }
@@ -185,11 +188,11 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         if (car_id == -99) {
             Intent i = new Intent(getApplicationContext(), AddNewCar.class);
             i.putExtra("cust_id", cust_id);
+            i.putExtra("cust_name", cust_name);
             startActivity(i);
         } else {
             Intent scan = new Intent(getApplicationContext(), Scan.class);
             scan.putExtra("title", "Scan QR Code");
-
             startActivityForResult(scan, SCAN_QR_CODE_INTENT);
         }
     }
@@ -235,7 +238,6 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
             e.printStackTrace();
         }
         Log.e("post qr details", jsonObj.toString());
-
 
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,

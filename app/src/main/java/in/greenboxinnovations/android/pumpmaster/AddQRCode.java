@@ -160,7 +160,9 @@ public class AddQRCode extends AppCompatActivity implements AdapterCustomerList.
             startActivity(i);
         } else {
             Intent i = new Intent(getApplicationContext(), CarList.class);
+            String cust_name = customerList.get(position).getDisplay_name();
             i.putExtra("cust_id", cust_id);
+            i.putExtra("cust_name", cust_name);
             startActivity(i);
         }
     }
