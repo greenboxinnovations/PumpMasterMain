@@ -2,16 +2,16 @@
     <string name="app_name">Pump Master</string>
 
     <!--LIVE COPY-->
-    <!--<string name="url_main">http://192.168.0.100/pump_master</string>-->
-    <!--<string name="url_hosted">http://fuelmaster.greenboxinnovations.in</string>-->
-    <!--<string name="url_add_customer">http://fuelmaster.greenboxinnovations.in/api/customers</string>-->
-    <!--<string name="url_add_customer_car">http://fuelmaster.greenboxinnovations.in/api/cars</string>-->
+    <string name="url_main">http://192.168.0.100</string>
+    <string name="url_hosted">http://fuelmaster.greenboxinnovations.in</string>
+    <string name="url_add_customer">http://fuelmaster.greenboxinnovations.in/api/customers</string>
+    <string name="url_add_customer_car">http://fuelmaster.greenboxinnovations.in/api/cars</string>
 
     <!--DEV-->
-    <string name="url_main">http://192.168.0.100</string>
-    <string name="url_hosted">http://fueltest.greenboxinnovations.in</string>
-    <string name="url_add_customer">http://fueltest.greenboxinnovations.in/api/customers</string>
-    <string name="url_add_customer_car">http://fueltest.greenboxinnovations.in/api/cars</string>
+    <!--<string name="url_main">http://192.168.0.100</string>-->
+    <!--<string name="url_hosted">http://fueltest.greenboxinnovations.in</string>-->
+    <!--<string name="url_add_customer">http://fueltest.greenboxinnovations.in/api/customers</string>-->
+    <!--<string name="url_add_customer_car">http://fueltest.greenboxinnovations.in/api/cars</string>-->
 
 
     <string name="url_app">http://192.168.0.100/pump_master/app/download.php?app_name=operator</string>
