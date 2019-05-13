@@ -416,6 +416,7 @@ public class MainActivity extends AppCompatActivity {
                                                             }
                                                             i.putExtra("jsonObject", jsonObject.toString());
                                                             i.putExtra("pump_code", val);
+                                                            receipt_number = 0;
                                                             startActivity(i);
                                                         }
                                                     }).
