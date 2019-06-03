@@ -333,11 +333,38 @@ public class MainActivity extends AppCompatActivity {
                                     jsonObject = response;
                                     Log.e("json", jsonObject.toString());
                                     receipt_number = Integer.valueOf(val);
-                                    Intent i = new Intent(getApplicationContext(), AddNewCar.class);
-                                    i.putExtra("isReceipt", true);
-                                    i.putExtra("cust_id", jsonObject.getInt("cust_id"));
-                                    i.putExtra("cust_name", jsonObject.getString("cust_name"));
-                                    startActivityForResult(i, ADD_CAR);
+
+                                    final String cust_name = jsonObject.getString("cust_name");
+                                    final int cust_id = jsonObject.getInt("cust_id");
+
+
+                                    final AlertDialog.Builder builder =
+                                        new AlertDialog.Builder(MainActivity.this).
+                                            setMessage(cust_name).
+                                            setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                    if (vibe != null) {
+                                                        vibe.vibrate(50);
+                                                    }
+
+
+                                                    Intent i = new Intent(getApplicationContext(), AddNewCar.class);
+                                                    i.putExtra("isReceipt", true);
+                                                    i.putExtra("cust_id", cust_id);
+                                                    i.putExtra("cust_name", cust_name);
+                                                    startActivityForResult(i, ADD_CAR);
+                                                }
+                                            }).
+                                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            }).setCancelable(false);
+                                    builder.create().show();
+
                                 } else {
                                     Log.e("result", "fail");
                                     Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
