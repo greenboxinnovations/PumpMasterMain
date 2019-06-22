@@ -79,6 +79,9 @@ public class Login extends AppCompatActivity {
         myGlobals = new MyGlobals(getApplicationContext());
         isWiFiEnabled = myGlobals.isWiFiEnabled();
 
+
+
+
         init();
         // checkers
         networkChecker();
@@ -191,6 +194,9 @@ public class Login extends AppCompatActivity {
         coordinatorLayout = findViewById(R.id.login_view);
 
         sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        String version = getResources().getString(R.string.url_main);
+        Log.e("App version", version);
     }
 
 

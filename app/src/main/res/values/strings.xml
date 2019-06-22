@@ -21,7 +21,7 @@
     <!--<string name="url_app">http://fuelmaster.greenboxinnovations.in/app/download.php?app_name=operator</string>-->
     <!--<string name="url_login">http://fuelmaster.greenboxinnovations.in/exe/login_and.php</string>-->
     <!--<string name="url_check_version">http://fuelmaster.greenboxinnovations.in/exe/check_version.php</string>-->
-    <string name="app_version">1</string>
+    <string name="app_version">1.1</string>
 
     <string name="title_activity_new_transaction">New Transaction</string>
     <string name="title_activity_add_qrcode">AddQRCode</string>
