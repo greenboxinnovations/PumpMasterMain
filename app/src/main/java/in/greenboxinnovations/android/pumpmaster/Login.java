@@ -9,9 +9,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
@@ -35,7 +37,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -51,6 +52,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class Login extends AppCompatActivity {
 
@@ -63,7 +65,7 @@ public class Login extends AppCompatActivity {
     private LinearLayout login_layout;
     private RelativeLayout no_connection_layout;
 
-    private boolean isWiFiEnabled;
+    private boolean isWiFiEnabled,isDataEnabled;
 
     //shared pref variables
     private static final String APP_SHARED_PREFS = "prefs";
@@ -79,9 +81,7 @@ public class Login extends AppCompatActivity {
 
         myGlobals = new MyGlobals(getApplicationContext());
         isWiFiEnabled = myGlobals.isWiFiEnabled();
-
-
-
+        isDataEnabled = myGlobals.isNetworkConnected();
 
         init();
         // checkers
@@ -150,6 +150,8 @@ public class Login extends AppCompatActivity {
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
             login_layout.setVisibility(View.INVISIBLE);
             no_connection_layout.setVisibility(View.VISIBLE);
+
+
         } else {
             login_layout.setVisibility(View.VISIBLE);
             no_connection_layout.setVisibility(View.INVISIBLE);
@@ -174,10 +176,38 @@ public class Login extends AppCompatActivity {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            if (telephonyManager != null) {
-                imei = telephonyManager.getDeviceId();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (telephonyManager != null) {
+                    imei = telephonyManager.getDeviceId();
+                }
+            }else {
+                imei = UUID.randomUUID().toString();
             }
-            Log.e("login", imei);
+            Log.e("IMEI", imei);
+
+        }
+
+        if (isDataEnabled){
+            final AlertDialog.Builder builder =
+                    new AlertDialog.Builder(Login.this).
+                            setMessage("Disable Mobile Data").
+                            setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                    }else{
+                                        startActivity(new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
+                                    }
+                                }
+                            }).
+                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).setCancelable(false);
+            builder.create().show();
         }
     }
 

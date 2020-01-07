@@ -54,8 +54,6 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_list);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         getBundle(savedInstanceState);
         init();

@@ -13,7 +13,7 @@
         android:paddingTop="70dp"
         android:visibility="visible">
 
-        <android.support.design.widget.TextInputLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
@@ -25,10 +25,10 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorAccent"
                 android:hint="User" />
-        </android.support.design.widget.TextInputLayout>
+        </RelativeLayout>
 
         <!-- Password Label -->
-        <android.support.design.widget.TextInputLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
@@ -41,9 +41,9 @@
                 android:backgroundTint="@color/colorAccent"
                 android:hint="Password"
                 android:inputType="number" />
-        </android.support.design.widget.TextInputLayout>
+        </RelativeLayout>
 
-        <android.support.v7.widget.AppCompatButton
+        <Button
             android:id="@+id/bLoginBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

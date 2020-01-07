@@ -8,7 +8,7 @@ public class MyGlobals{
     Context mContext;
 
     // constructor
-    public MyGlobals(Context context){
+    MyGlobals(Context context){
         this.mContext = context;
     }
 
@@ -16,17 +16,24 @@ public class MyGlobals{
         return "test";
     }
 
-    public boolean isNetworkConnected() {
+    boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         assert cm != null;
         NetworkInfo ni = cm.getActiveNetworkInfo();
-        return ni != null;
+
+        assert ni != null;
+        if (ni.getTypeName().equalsIgnoreCase("MOBILE")){
+            return ni.isConnected();
+        }
+        return false;
     }
 
-    public boolean isWiFiEnabled() {
+    boolean isWiFiEnabled() {
         ConnectivityManager connManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         assert connManager != null;
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        assert mWifi != null;
         return mWifi.isConnected();
     }
 }

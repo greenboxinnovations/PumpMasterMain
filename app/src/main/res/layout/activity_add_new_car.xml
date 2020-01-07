@@ -7,94 +7,96 @@
     android:layout_height="match_parent"
     tools:context=".AddNewCar">
 
+
     <EditText
         android:id="@+id/et_vehicle_no"
-        android:layout_width="234dp"
-        android:layout_height="144dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="96dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="196dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="26dp"
         android:ems="10"
         android:hint="Vehicle Number"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <RadioGroup
-        android:id="@+id/radio_fuel"
-        android:layout_width="123dp"
-        android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.128"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_vehicle_no">
-
-        <RadioButton
-            android:id="@+id/petrol"
-
-            android:layout_width="101dp"
-            android:layout_height="wrap_content"
-            android:text="Petrol" />
-
-        <RadioButton
-            android:id="@+id/diesel"
-            android:layout_width="101dp"
-            android:layout_height="wrap_content"
-            android:text="Diesel" />
-
-
-    </RadioGroup>
+        app:layout_constraintBottom_toTopOf="@+id/petrol"
+        app:layout_constraintStart_toStartOf="@+id/tv_cust_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_cust_name" />
 
     <Button
         android:id="@+id/btn_save_new_car"
-        android:layout_width="89dp"
-        android:layout_height="51dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
 
 
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="184dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="266dp"
         android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.516"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/progressBar_cc"
+        app:layout_constraintStart_toStartOf="@+id/progressBar_cc"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar_cc" />
 
     <ProgressBar
         android:id="@+id/progressBar_cc"
         style="?android:attr/progressBarStyle"
         android:layout_width="116dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="94dp"
+        android:layout_marginBottom="53dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/btn_save_new_car"
+        app:layout_constraintStart_toStartOf="@+id/radio_fuel"
+        app:layout_constraintTop_toBottomOf="@+id/diesel" />
 
     <TextView
         android:id="@+id/tv_cust_name"
         android:layout_width="wrap_content"
-        android:layout_height="51dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="91dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginBottom="36dp"
         android:text="Test Company"
         android:textSize="30sp"
         android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintBottom_toTopOf="@+id/et_vehicle_no"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioButton
+        android:id="@+id/petrol"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Petrol"
+        app:layout_constraintBottom_toTopOf="@+id/diesel"
+        app:layout_constraintEnd_toEndOf="@+id/diesel"
+        app:layout_constraintStart_toStartOf="@+id/radio_fuel"
+        app:layout_constraintTop_toBottomOf="@+id/et_vehicle_no" />
+
+    <RadioButton
+        android:id="@+id/diesel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="38dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginBottom="13dp"
+        android:text="Diesel"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar_cc"
+        app:layout_constraintEnd_toEndOf="@+id/radio_fuel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/petrol" />
+
+    <RadioGroup
+        android:id="@+id/radio_fuel"
+        android:layout_width="123dp"
+        android:layout_height="66dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="38dp"
+        app:layout_constraintBottom_toBottomOf="@+id/petrol"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/petrol">
+
+
+    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

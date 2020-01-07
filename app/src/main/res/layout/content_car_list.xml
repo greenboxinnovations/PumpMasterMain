@@ -8,7 +8,7 @@
     tools:context=".CarList"
     tools:showIn="@layout/activity_car_list">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_car_list"
         android:layout_width="0dp"
         android:layout_height="0dp"

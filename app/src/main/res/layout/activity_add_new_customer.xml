@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="37dp"
         android:ems="10"
         android:hint="First Name"
         android:inputType="textPersonName"
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="15dp"
         android:ems="10"
         android:hint="Last Name"
         android:inputType="textPersonName"
@@ -49,21 +49,20 @@
         android:id="@+id/et_mobile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="11dp"
         android:ems="10"
         android:hint="Mobile"
         android:inputType="number"
         android:maxLength="10"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/progressBar" />
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/et_l_name" />
 
     <EditText
         android:id="@+id/et_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="11dp"
         android:ems="10"
         android:hint="Address"
         android:inputType="text"
@@ -75,20 +74,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
         android:ems="10"
         android:hint="OTP"
         android:inputType="number"
         android:maxLength="6"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_otp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_mobile" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_otp" />
 
     <EditText
         android:id="@+id/et_opening_balance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Opening Balance"
         android:inputType="number"
@@ -99,13 +98,11 @@
         android:id="@+id/btn_save_new_customer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginStart="71dp"
+        android:layout_marginTop="26dp"
         android:text="SAVE NEW CUSTOMER"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/et_opening_balance"
         app:layout_constraintTop_toBottomOf="@+id/et_opening_balance" />
 
     <ProgressBar
@@ -114,16 +111,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/et_mobile"
         app:layout_constraintEnd_toEndOf="@+id/et_l_name"
-        app:layout_constraintTop_toBottomOf="@+id/et_l_name" />
+        app:layout_constraintTop_toTopOf="@+id/et_mobile" />
 
     <Button
         android:id="@+id/btn_otp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="52dp"
         android:text="Send Otp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/et_otp"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
