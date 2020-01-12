@@ -1,10 +1,8 @@
 package in.greenboxinnovations.android.pumpmaster;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,7 +20,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.android.volley.AuthFailureError;
@@ -40,6 +37,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class NewTransaction extends AppCompatActivity {
 
@@ -67,20 +65,20 @@ public class NewTransaction extends AppCompatActivity {
         return (double) tmp / factor;
     }
 
-    public static Bitmap decodeSampledBitmapFromResource(File file, int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getPath(), options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(file.getPath(), options);
-    }
+//    public static Bitmap decodeSampledBitmapFromResource(File file, int reqWidth, int reqHeight) {
+//
+//        // First decode with inJustDecodeBounds=true to check dimensions
+//        final BitmapFactory.Options options = new BitmapFactory.Options();
+//        options.inJustDecodeBounds = true;
+//        BitmapFactory.decodeFile(file.getPath(), options);
+//
+//        // Calculate inSampleSize
+//        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+//
+//        // Decode bitmap with inSampleSize set
+//        options.inJustDecodeBounds = false;
+//        return BitmapFactory.decodeFile(file.getPath(), options);
+//    }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
@@ -124,7 +122,7 @@ public class NewTransaction extends AppCompatActivity {
         shift = sharedPrefs.getString("shift", "");
 
         try {
-            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("jsonObject"));
+            JSONObject jsonObj = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("jsonObject")));
             Log.e("tag", jsonObj.getString("cust_name"));
             isPetrol = jsonObj.getBoolean("isPetrol");
             car_id = jsonObj.getInt("car_id");
@@ -144,7 +142,7 @@ public class NewTransaction extends AppCompatActivity {
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("errer", e.getMessage());
+            Log.e("errer", Objects.requireNonNull(e.getMessage()));
         }
 
 
@@ -355,7 +353,7 @@ public class NewTransaction extends AppCompatActivity {
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.e("error", e.getMessage());
+                Log.e("error", Objects.requireNonNull(e.getMessage()));
             }
 
             Log.e("Json Object", "obj" + jsonObj.toString());
@@ -423,15 +421,15 @@ public class NewTransaction extends AppCompatActivity {
 //        super.onBackPressed();
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean isMyServiceRunning(Class<?> serviceClass) {
+//        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//            if (serviceClass.getName().equals(service.service.getClassName())) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     private class GenericTextWatcher implements TextWatcher {
 

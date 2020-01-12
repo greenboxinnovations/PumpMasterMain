@@ -1,14 +1,14 @@
 package in.greenboxinnovations.android.pumpmaster;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -19,18 +19,18 @@ public class AdapterCustomerList extends RecyclerView.Adapter<AdapterCustomerLis
     private gridListener mListener;
 
 
-    public AdapterCustomerList(ArrayList<POJO_id_string> customerList, Context context, gridListener mListener) {
+    AdapterCustomerList(ArrayList<POJO_id_string> customerList, Context context, gridListener mListener) {
         this.customerList = customerList;
         this.context = context;
         this.mListener = mListener;
     }
 
 
-    public static class CustomerViewHolder extends RecyclerView.ViewHolder {
+    static class CustomerViewHolder extends RecyclerView.ViewHolder {
         TextView cust_name;
         RelativeLayout tile;
 
-        public CustomerViewHolder(View itemView) {
+        CustomerViewHolder(View itemView) {
             super(itemView);
             cust_name = itemView.findViewById(R.id.tv_cust_single_name);
             tile = itemView.findViewById(R.id.rl_cust_single);
@@ -38,12 +38,12 @@ public class AdapterCustomerList extends RecyclerView.Adapter<AdapterCustomerLis
     }
 
 
+    @NonNull
     @Override
     public AdapterCustomerList.CustomerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.customer_single, parent, false);
-        CustomerViewHolder vh = new CustomerViewHolder(v);
-        return vh;
+        return new CustomerViewHolder(v);
     }
 
     @Override
@@ -75,12 +75,12 @@ public class AdapterCustomerList extends RecyclerView.Adapter<AdapterCustomerLis
         return customerList.size();
     }
 
-    public void updateReceiptsList(ArrayList<POJO_id_string> newlist) {
-//        customerList.clear();
-//        customerList.addAll(newlist);
-//        this.notifyDataSetChanged();
-//        Log.e("ada",""+customerList.size());
-    }
+//    public void updateReceiptsList(ArrayList<POJO_id_string> newlist) {
+////        customerList.clear();
+////        customerList.addAll(newlist);
+////        this.notifyDataSetChanged();
+////        Log.e("ada",""+customerList.size());
+//    }
 
 
     public interface gridListener {

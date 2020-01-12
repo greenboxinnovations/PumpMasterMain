@@ -1,6 +1,5 @@
 package in.greenboxinnovations.android.pumpmaster;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -133,7 +132,7 @@ public class HttpFileUpload extends AsyncTask<String, Integer, String> {
 
             dos.flush();
 
-            Log.e(Tag, "File Sent, Response: " + String.valueOf(conn.getResponseCode()));
+            Log.e(Tag, "File Sent, Response: " + conn.getResponseCode());
 
             InputStream is = conn.getInputStream();
 

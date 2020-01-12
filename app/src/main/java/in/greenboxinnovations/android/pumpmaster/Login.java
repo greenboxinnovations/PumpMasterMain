@@ -468,13 +468,10 @@ public class Login extends AppCompatActivity {
         int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
         //If permission is granted returning true
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
+        return result == PackageManager.PERMISSION_GRANTED;
 
 
         //If permission is not granted returning false
-        return false;
     }
 
     private void requestPermission() {

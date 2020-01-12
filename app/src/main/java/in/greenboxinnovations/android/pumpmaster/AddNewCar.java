@@ -13,7 +13,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -30,7 +29,7 @@ import java.util.Objects;
 public class AddNewCar extends AppCompatActivity {
 
     private int cust_id = 0;
-    private String cust_name;
+//    private String cust_name;
 
     private TextView tv_cust_name;
     private Button save;
@@ -50,7 +49,7 @@ public class AddNewCar extends AppCompatActivity {
 
         init();
 
-        //noinspection ConstantConditions
+        //noinspection -ConstantConditions
         if (getIntent().hasExtra("cust_id")) {
             cust_id = Objects.requireNonNull(getIntent().getExtras()).getInt("cust_id", -1);
         }
@@ -61,7 +60,7 @@ public class AddNewCar extends AppCompatActivity {
         }
 
         if (getIntent().hasExtra("cust_name")) {
-            tv_cust_name.setText((getIntent().getExtras()).getString("cust_name"));
+            tv_cust_name.setText((Objects.requireNonNull(getIntent().getExtras())).getString("cust_name"));
             tv_cust_name.setVisibility(View.VISIBLE);
         }
 
@@ -191,7 +190,7 @@ public class AddNewCar extends AppCompatActivity {
         }) {
 
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/json");
                 headers.put("charset", "utf-8");

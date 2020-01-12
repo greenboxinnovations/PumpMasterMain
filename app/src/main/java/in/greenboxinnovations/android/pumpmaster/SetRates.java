@@ -15,10 +15,8 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -78,7 +76,7 @@ public class SetRates extends AppCompatActivity {
 
     private void setRates() {
 
-        Boolean check = false;
+        boolean check = false;
 
         // hide keyboard on submit
         View view = this.getCurrentFocus();
@@ -168,7 +166,7 @@ public class SetRates extends AppCompatActivity {
                     }) {
 
                         @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
+                        public Map<String, String> getHeaders() {
                             HashMap<String, String> headers = new HashMap<>();
                             headers.put("Content-Type", "application/json");
                             headers.put("charset", "utf-8");
@@ -303,7 +301,7 @@ public class SetRates extends AppCompatActivity {
         }) {
 
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/json");
                 headers.put("charset", "utf-8");

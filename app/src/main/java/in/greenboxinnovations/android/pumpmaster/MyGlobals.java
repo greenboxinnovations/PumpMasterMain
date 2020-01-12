@@ -4,17 +4,17 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class MyGlobals{
-    Context mContext;
+class MyGlobals{
+    private Context mContext;
 
     // constructor
     MyGlobals(Context context){
         this.mContext = context;
     }
 
-    public String getUserName(){
-        return "test";
-    }
+//    public String getUserName(){
+//        return "test";
+//    }
 
     boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);

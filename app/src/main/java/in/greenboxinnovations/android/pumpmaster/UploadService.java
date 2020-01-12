@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 public class UploadService extends Service implements AysncInterface{
 
@@ -105,7 +106,7 @@ public class UploadService extends Service implements AysncInterface{
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, Objects.requireNonNull(e.getMessage()));
         }
     }
 

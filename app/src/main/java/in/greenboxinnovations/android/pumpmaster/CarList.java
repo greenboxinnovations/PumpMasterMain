@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -169,6 +168,7 @@ public class CarList extends AppCompatActivity implements AdapterCustomerList.gr
         if (requestCode == SCAN_QR_CODE_INTENT && resultCode == RESULT_OK) {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
+                assert barcode != null;
                 String val = barcode.displayValue;
                 Log.e("car_qr_code", "" + val);
 

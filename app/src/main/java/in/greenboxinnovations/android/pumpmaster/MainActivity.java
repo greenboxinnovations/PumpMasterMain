@@ -18,10 +18,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -39,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String APP_SHARED_PREFS = "prefs";
     private SharedPreferences sharedPrefs;
     private JSONObject jsonObject;
-    private TextView petrol_rate, diesel_rate, user_name, pump_name, petrol_title, diesel_title;
     private int car_id, receipt_number = 0;
     private String pump_code;
     private static final int SCAN_CAR = 100;
@@ -89,19 +87,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
 
-        petrol_title = findViewById(R.id.tv_petrol_rate_title);
-        diesel_title = findViewById(R.id.tv_diesel_rate_title);
-        pump_name = findViewById(R.id.tv_pump_name);
-
-        petrol_rate = findViewById(R.id.tv_petrol_rate);
-        diesel_rate = findViewById(R.id.tv_diesel_rate);
-        user_name = findViewById(R.id.tv_user_name);
+        TextView petrol_rate = findViewById(R.id.tv_petrol_rate);
+        TextView diesel_rate = findViewById(R.id.tv_diesel_rate);
+        TextView user_name = findViewById(R.id.tv_user_name);
 
 
         jsonObject = null;
 
-        petrol_rate.setText(String.valueOf(sharedPrefs.getString("petrol_rate", "00.00")));
-        diesel_rate.setText(String.valueOf(sharedPrefs.getString("diesel_rate", "00.00")));
+        petrol_rate.setText(sharedPrefs.getString("petrol_rate", "00.00"));
+        diesel_rate.setText(sharedPrefs.getString("diesel_rate", "00.00"));
         user_name.setText(sharedPrefs.getString("user_name", "error"));
     }
 
@@ -111,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
         isWiFiEnabled = myGlobals.isWiFiEnabled();
 
-        String date_login = String.valueOf(sharedPrefs.getString("date", ""));
+        String date_login = sharedPrefs.getString("date", "");
 
         Date cDate = new Date();
         final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
@@ -132,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SCAN_CAR && resultCode == RESULT_OK) {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
+                assert barcode != null;
                 String val = barcode.displayValue;
                 Log.e("car_qr_code", "" + val);
                 isCodeValid(val);
@@ -141,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
 
+                assert barcode != null;
                 String val = barcode.displayValue;
                 Log.e("pump_qr_code", "" + val);
                 pump_code = val;
@@ -162,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     jsonObject.put("isPetrol", isPetrol);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.e("ad", e.getMessage());
+                    Log.e("ad", Objects.requireNonNull(e.getMessage()));
                 }
                 Log.e("json", jsonObject.toString());
                 // scan pump now
@@ -292,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
             }) {
 
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json");
                     headers.put("charset", "utf-8");
