@@ -4,6 +4,7 @@
     <!--LIVE COPY-->
     <string name="url_main">http://192.168.0.100</string>
     <string name="url_hosted">http://fuelmaster.greenboxinnovations.in</string>
+    <string name="url_online">https://pay.greenboxinnovations.in</string>
     <string name="url_add_customer">http://fuelmaster.greenboxinnovations.in/api/customers</string>
     <string name="url_add_customer_car">http://fuelmaster.greenboxinnovations.in/api/cars</string>
 

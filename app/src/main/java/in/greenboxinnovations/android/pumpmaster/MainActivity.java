@@ -1,5 +1,6 @@
 package in.greenboxinnovations.android.pumpmaster;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,14 +16,18 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,6 +37,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -111,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
         Log.e("date", date);
 
+
         if (!date.equals(date_login)) {
             sharedPrefs.edit().clear().apply();
             Intent i = new Intent(getApplicationContext(), Login.class);
@@ -129,7 +136,11 @@ public class MainActivity extends AppCompatActivity {
                 assert barcode != null;
                 String val = barcode.displayValue;
                 Log.e("car_qr_code", "" + val);
-                isCodeValid(val);
+
+                isOnlinecustomer(val);
+
+                //moved to after isOnline check false
+                //isCodeValid(val);
             }
         }
         if (requestCode == SCAN_PUMP && resultCode == RESULT_OK) {
@@ -221,6 +232,99 @@ public class MainActivity extends AppCompatActivity {
                 .create();
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         dialog.show();
+    }
+
+    //online database check
+    private void isOnlinecustomer(final String val) {
+        if (isWiFiEnabled) {
+
+            String url = AppConstants.SCAN_CUST_QR + "?qr=" + val;
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                    url, null,
+                    new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e("login response", response.toString());
+
+                            try {
+
+                                jsonObject = response;
+
+                                //jsonobject comprises of all below items
+
+                                String car_no = response.getString("car_no");
+                                String cust_name = response.getString("cust_name");
+                                String response_code = response.getString("trans_status");
+                                int amount = response.getInt("amount");
+                                String fuel_type = response.getString("'fuel_type'");
+                                String car_qr_type = response.getString("car_qr_type");
+
+                                if (response_code.equals("success")) {
+                                    final AlertDialog.Builder builder =
+                                            new AlertDialog.Builder(MainActivity.this).
+                                                    setTitle(fuel_type).
+                                                    setMessage(amount).
+                                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                            if (vibe != null) {
+                                                                vibe.vibrate(50);
+                                                            }
+                                                            Intent scan = new Intent(getApplicationContext(), Scan.class);
+                                                            scan.putExtra("title", "Scan Pump");
+                                                            startActivityForResult(scan, SCAN_PUMP);
+                                                        }
+                                                    });
+                                    builder.create().show();
+                                }
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    NetworkResponse networkResponse = error.networkResponse;
+                    if (networkResponse != null && networkResponse.statusCode == 409) {
+                        // HTTP Status Code: 409 Client error
+                        try {
+                            String jsonString = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
+                            JSONObject obj = new JSONObject(jsonString);
+                            String message = obj.getString("message");
+                            if (message.equals("QR Invalid")) {
+                                isCodeValid(val);
+                            }
+                            Log.e("NetworkResponse", message);
+                            Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
+                        } catch (UnsupportedEncodingException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Log.e("REF_VERIFY_URL", error.toString());
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("charset", "utf-8");
+                    return headers;
+                }
+            };
+            MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+
+        } else {
+            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     //local network check
@@ -336,30 +440,30 @@ public class MainActivity extends AppCompatActivity {
 
 
                                     final AlertDialog.Builder builder =
-                                        new AlertDialog.Builder(MainActivity.this).
-                                            setMessage(cust_name).
-                                            setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                                    if (vibe != null) {
-                                                        vibe.vibrate(50);
-                                                    }
+                                            new AlertDialog.Builder(MainActivity.this).
+                                                    setMessage(cust_name).
+                                                    setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                            if (vibe != null) {
+                                                                vibe.vibrate(50);
+                                                            }
 
 
-                                                    Intent i = new Intent(getApplicationContext(), AddNewCar.class);
-                                                    i.putExtra("isReceipt", true);
-                                                    i.putExtra("cust_id", cust_id);
-                                                    i.putExtra("cust_name", cust_name);
-                                                    startActivityForResult(i, ADD_CAR);
-                                                }
-                                            }).
-                                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                }
-                                            }).setCancelable(false);
+                                                            Intent i = new Intent(getApplicationContext(), AddNewCar.class);
+                                                            i.putExtra("isReceipt", true);
+                                                            i.putExtra("cust_id", cust_id);
+                                                            i.putExtra("cust_name", cust_name);
+                                                            startActivityForResult(i, ADD_CAR);
+                                                        }
+                                                    }).
+                                                    setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    }).setCancelable(false);
                                     builder.create().show();
 
                                 } else {

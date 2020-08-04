@@ -83,6 +83,8 @@ public class Login extends AppCompatActivity {
         isWiFiEnabled = myGlobals.isWiFiEnabled();
         isDataEnabled = myGlobals.isNetworkConnected();
 
+
+
         init();
         // checkers
         networkChecker();
@@ -110,6 +112,16 @@ public class Login extends AppCompatActivity {
                 networkChecker();
             }
         });
+
+        sharedPrefs.edit()
+                .putString("date", "2020-08-03")
+                .putString("shift", "b")
+                .putInt("user_id",1)
+                .putInt("pump_id", 1)
+                .putString("petrol_rate", "80.00")
+                .putString("diesel_rate","80.00")
+                .putString("user_name", "Imran")
+                .apply();
 
     }
 
