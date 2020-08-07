@@ -6,7 +6,4 @@ public interface AppConstants {
 
     String SCAN_CUST_QR = BASE_URL + "/pump_scan";
 
-
-
-
 }

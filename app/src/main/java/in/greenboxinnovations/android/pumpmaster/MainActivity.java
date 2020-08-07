@@ -65,17 +65,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initAndDisplayRates();
 
-        myGlobals = new MyGlobals(getApplicationContext());
-        isWiFiEnabled = myGlobals.isWiFiEnabled();
-
-        coordinatorLayout = findViewById(R.id.activity_main_layout);
-        sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
-
-
-        init();
-        car_id = 0;
-        pump_code = null;
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,12 +77,21 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Intent scan = new Intent(getApplicationContext(), Scan.class);
                 scan.putExtra("title", "Scan Car");
-                startActivityForResult(scan, 100);
+                startActivityForResult(scan, SCAN_CAR);
             }
         });
     }
 
-    private void init() {
+    private void initAndDisplayRates() {
+
+        myGlobals = new MyGlobals(getApplicationContext());
+        isWiFiEnabled = myGlobals.isWiFiEnabled();
+
+        coordinatorLayout = findViewById(R.id.activity_main_layout);
+        sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        car_id = 0;
+        pump_code = null;
 
         TextView petrol_rate = findViewById(R.id.tv_petrol_rate);
         TextView diesel_rate = findViewById(R.id.tv_diesel_rate);
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         jsonObject = null;
-
+        // display fuel rates rates
         petrol_rate.setText(sharedPrefs.getString("petrol_rate", "00.00"));
         diesel_rate.setText(sharedPrefs.getString("diesel_rate", "00.00"));
         user_name.setText(sharedPrefs.getString("user_name", "error"));
@@ -111,20 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
         isWiFiEnabled = myGlobals.isWiFiEnabled();
 
-        String date_login = sharedPrefs.getString("date", "");
-
-        Date cDate = new Date();
-        final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
-        Log.e("date", date);
-
-
-        if (!date.equals(date_login)) {
-            sharedPrefs.edit().clear().apply();
-            Intent i = new Intent(getApplicationContext(), Login.class);
-            startActivity(i);
-            finish();
-        }
-
+        // logout yesterdays user
+        logoutYesterdaySignIn();
     }
 
     @Override
@@ -134,13 +122,13 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 final Barcode barcode = data.getParcelableExtra("barcode");
                 assert barcode != null;
-                String val = barcode.displayValue;
-                Log.e("car_qr_code", "" + val);
+                String qr = barcode.displayValue;
+                Log.e("car_qr_code", "" + qr);
 
-                isOnlinecustomer(val);
+                isOnlineCustomer(qr);
 
-                //moved to after isOnline check false
-                //isCodeValid(val);
+                // moved to after isOnline check false
+                // isCodeValid(val);
             }
         }
         if (requestCode == SCAN_PUMP && resultCode == RESULT_OK) {
@@ -235,10 +223,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //online database check
-    private void isOnlinecustomer(final String val) {
+    private void isOnlineCustomer(final String qr) {
         if (isWiFiEnabled) {
 
-            String url = AppConstants.SCAN_CUST_QR + "?qr=" + val;
+            String url = AppConstants.SCAN_CUST_QR + "?qr=" + qr;
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                     url, null,
@@ -252,34 +240,29 @@ public class MainActivity extends AppCompatActivity {
 
                                 jsonObject = response;
 
-                                //jsonobject comprises of all below items
+                                // jsonObject comprises of all below items
 
-                                String car_no = response.getString("car_no");
-                                String cust_name = response.getString("cust_name");
-                                String response_code = response.getString("trans_status");
-                                int amount = response.getInt("amount");
-                                String fuel_type = response.getString("'fuel_type'");
-                                String car_qr_type = response.getString("car_qr_type");
+                                String amount = response.getString("amount");
+                                String fuel_type = response.getString("fuel_type");
 
-                                if (response_code.equals("success")) {
-                                    final AlertDialog.Builder builder =
-                                            new AlertDialog.Builder(MainActivity.this).
-                                                    setTitle(fuel_type).
-                                                    setMessage(amount).
-                                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                                            if (vibe != null) {
-                                                                vibe.vibrate(50);
-                                                            }
-                                                            Intent scan = new Intent(getApplicationContext(), Scan.class);
-                                                            scan.putExtra("title", "Scan Pump");
-                                                            startActivityForResult(scan, SCAN_PUMP);
+
+                                final AlertDialog.Builder builder =
+                                        new AlertDialog.Builder(MainActivity.this).
+                                                setTitle(fuel_type).
+                                                setMessage(amount).
+                                                setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                                        if (vibe != null) {
+                                                            vibe.vibrate(50);
                                                         }
-                                                    });
-                                    builder.create().show();
-                                }
+                                                        Intent scan = new Intent(getApplicationContext(), Scan.class);
+                                                        scan.putExtra("title", "Scan Pump");
+                                                        startActivityForResult(scan, SCAN_PUMP);
+                                                    }
+                                                });
+                                builder.create().show();
 
 
                             } catch (JSONException e) {
@@ -299,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject obj = new JSONObject(jsonString);
                             String message = obj.getString("message");
                             if (message.equals("QR Invalid")) {
-                                isCodeValid(val);
+                                isCodeValid(qr);
                             }
                             Log.e("NetworkResponse", message);
                             Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
@@ -643,6 +626,22 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void logoutYesterdaySignIn() {
+        String date_login = sharedPrefs.getString("date", "");
+
+        Date cDate = new Date();
+        final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(cDate);
+        Log.e("date", date);
+
+
+        if (!date.equals(date_login)) {
+            sharedPrefs.edit().clear().apply();
+            Intent i = new Intent(getApplicationContext(), Login.class);
+            startActivity(i);
+            finish();
         }
     }
 }

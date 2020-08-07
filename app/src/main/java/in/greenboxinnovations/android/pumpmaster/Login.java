@@ -48,6 +48,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -65,7 +66,7 @@ public class Login extends AppCompatActivity {
     private LinearLayout login_layout;
     private RelativeLayout no_connection_layout;
 
-    private boolean isWiFiEnabled,isDataEnabled;
+    private boolean isWiFiEnabled, isDataEnabled;
 
     //shared pref variables
     private static final String APP_SHARED_PREFS = "prefs";
@@ -84,44 +85,70 @@ public class Login extends AppCompatActivity {
         isDataEnabled = myGlobals.isNetworkConnected();
 
 
-
         init();
+
         // checkers
         networkChecker();
 
-        checkPhotoDir();
+        //============================================================================
+        // bypass login
 
-        // login
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                if (vibe != null) {
-                    vibe.vibrate(50);
-                }
-                logUser();
-
-//                Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-
-        // network retry
-        retry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                networkChecker();
-            }
-        });
+        String bypass_date = "2020-08-06";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDate date = LocalDate.now();
+            bypass_date = date.toString();
+        }
 
         sharedPrefs.edit()
-                .putString("date", "2020-08-03")
+                .putString("date", bypass_date)
                 .putString("shift", "b")
-                .putInt("user_id",1)
+                .putInt("user_id", 1)
                 .putInt("pump_id", 1)
                 .putString("petrol_rate", "80.00")
-                .putString("diesel_rate","80.00")
+                .putString("diesel_rate", "80.00")
                 .putString("user_name", "Imran")
                 .apply();
+
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+        finish();
+        //============================================================================
+
+
+//
+//        checkPhotoDir();
+//
+//        // login
+//        login.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//                if (vibe != null) {
+//                    vibe.vibrate(50);
+//                }
+//                logUser();
+//
+////                Snackbar.make(coordinatorLayout, "Empty Fields!", Snackbar.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        // network retry
+//        retry.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                networkChecker();
+//            }
+//        });
+//
+//        sharedPrefs.edit()
+//                .putString("date", "2020-08-03")
+//                .putString("shift", "b")
+//                .putInt("user_id",1)
+//                .putInt("pump_id", 1)
+//                .putString("petrol_rate", "80.00")
+//                .putString("diesel_rate","80.00")
+//                .putString("user_name", "Imran")
+//                .apply();
 
     }
 
@@ -153,74 +180,75 @@ public class Login extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        isWiFiEnabled = myGlobals.isWiFiEnabled();
-        if (!isWiFiEnabled) {
-            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (vibe != null) {
-                vibe.vibrate(50);
-            }
-            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
-            login_layout.setVisibility(View.INVISIBLE);
-            no_connection_layout.setVisibility(View.VISIBLE);
-
-
-        } else {
-            login_layout.setVisibility(View.VISIBLE);
-            no_connection_layout.setVisibility(View.INVISIBLE);
-        }
-
-        if (!sharedPrefs.getString("shift", "").equals("")) {
-            Intent i = new Intent(this, MainActivity.class);
-            startActivity(i);
-            finish();
-        }
-
-        if (!isReadPhoneStateAllowed()) {
-            requestPermission();
-        } else {
-            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                if (telephonyManager != null) {
-                    imei = telephonyManager.getDeviceId();
-                }
-            }else {
-                imei = UUID.randomUUID().toString();
-            }
-            Log.e("IMEI", imei);
-
-        }
-
-        if (isDataEnabled){
-            final AlertDialog.Builder builder =
-                    new AlertDialog.Builder(Login.this).
-                            setMessage("Disable Mobile Data").
-                            setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                        startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
-                                    }else{
-                                        startActivity(new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
-                                    }
-                                }
-                            }).
-                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).setCancelable(false);
-            builder.create().show();
-        }
+//        isWiFiEnabled = myGlobals.isWiFiEnabled();
+//        if (!isWiFiEnabled) {
+//            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//            if (vibe != null) {
+//                vibe.vibrate(50);
+//            }
+//            Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
+//            login_layout.setVisibility(View.INVISIBLE);
+//            no_connection_layout.setVisibility(View.VISIBLE);
+//
+//
+//        } else {
+//            login_layout.setVisibility(View.VISIBLE);
+//            no_connection_layout.setVisibility(View.INVISIBLE);
+//        }
+//
+//        if (!sharedPrefs.getString("shift", "").equals("")) {
+//            Intent i = new Intent(this, MainActivity.class);
+//            startActivity(i);
+//            finish();
+//        }
+//
+//        if (!isReadPhoneStateAllowed()) {
+//            requestPermission();
+//        } else {
+//            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                return;
+//            }
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//                if (telephonyManager != null) {
+////                    imei = telephonyManager.getDeviceId();
+//                    imei = "not allowed";
+//                }
+//            } else {
+//                imei = UUID.randomUUID().toString();
+//            }
+//            Log.e("IMEI", imei);
+//
+//        }
+//
+//        if (isDataEnabled) {
+//            final AlertDialog.Builder builder =
+//                    new AlertDialog.Builder(Login.this).
+//                            setMessage("Disable Mobile Data").
+//                            setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                                        startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+//                                    } else {
+//                                        startActivity(new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
+//                                    }
+//                                }
+//                            }).
+//                            setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            }).setCancelable(false);
+//            builder.create().show();
+//        }
     }
 
     private void init() {
@@ -424,16 +452,16 @@ public class Login extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         int val = Integer.valueOf(String.valueOf(input.getText()));
-                        if (val == 124578){
-                            if (i == 0){
+                        if (val == 124578) {
+                            if (i == 0) {
                                 Intent i = new Intent(getApplicationContext(), AddQRCode.class);
                                 startActivity(i);
-                            }else if(i == 1){
+                            } else if (i == 1) {
                                 Intent i = new Intent(getApplicationContext(), SetRates.class);
                                 startActivity(i);
                             }
 
-                        }else{
+                        } else {
                             Snackbar.make(coordinatorLayout, "Access Denied", Snackbar.LENGTH_SHORT).show();
                         }
                     }
