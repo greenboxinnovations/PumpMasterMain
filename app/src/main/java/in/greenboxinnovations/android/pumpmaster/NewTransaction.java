@@ -56,7 +56,7 @@ public class NewTransaction extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private RelativeLayout rl_back;
     private int car_id, cust_id, user_id, pump_id;
-    private String shift, pump_code, cust_name, car_no, low_alert, receipt_number;
+    private String shift, pump_code, cust_name, car_no, low_alert, receipt_number, cust_type, cust_qr;
     private File outputFile;
     private boolean isWiFiEnabled, click = false;
     private SharedPreferences sharedPrefs;
@@ -112,65 +112,13 @@ public class NewTransaction extends AppCompatActivity {
 
         init();
 
-//        enableDebugMode();
+        boolean isCreditCustomer = getBundleData();
 
-        pump_code = getIntent().getStringExtra("pump_code");
+        setPetrolDieselUI();
 
-        Log.e("asd", "" + pump_code);
-
-        p_rate = Double.valueOf(sharedPrefs.getString("petrol_rate", "-1"));
-        d_rate = Double.valueOf(sharedPrefs.getString("diesel_rate", "-1"));
-
-        user_id = sharedPrefs.getInt("user_id", -1);
-        pump_id = sharedPrefs.getInt("pump_id", -1);
-        shift = sharedPrefs.getString("shift", "");
-
-        try {
-            JSONObject jsonObj = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("jsonObject")));
-            Log.e("tag", jsonObj.getString("cust_name"));
-            isPetrol = jsonObj.getBoolean("isPetrol");
-            car_id = jsonObj.getInt("car_id");
-            cust_id = jsonObj.getInt("cust_id");
-            cust_name = jsonObj.getString("cust_name");
-            receipt_number = jsonObj.getString("receipt_number");
-            car_no = jsonObj.getString("car_no");
-            tv_car_no_plate.setText(car_no);
-            tv_cust_name.setText(cust_name);
-            Log.e("asd", "" + receipt_number);
-
-            if (jsonObj.getBoolean("alert")) {
-                tv_low_alert.setVisibility(View.VISIBLE);
-                String alert = "Low Balance : " + jsonObj.getString("alert_value");
-                tv_low_alert.setText(alert);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("errer", Objects.requireNonNull(e.getMessage()));
+        if (isCreditCustomer) {
+            setInputTextWatchers();
         }
-
-
-//        tv_car_no_plate.setText(car_no);
-//        tv_cust_name.setText(cust_name);
-
-
-        if (isPetrol) {
-            rl_back.setBackgroundColor(Color.parseColor("#0D9F56"));
-            fuel_rate.setText(String.valueOf(p_rate));
-
-        } else {
-            rl_back.setBackgroundColor(Color.parseColor("#00AAE8"));
-            fuel_type.setText("Diesel");
-            fuel_rate.setText(String.valueOf(d_rate));
-        }
-
-        et_fuel_litres.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(7, 2)});
-        et_fuel_rs.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(6, 2)});
-
-        // text change listener
-        et_fuel_litres.addTextChangedListener(new GenericTextWatcher(et_fuel_litres));
-        et_fuel_rs.addTextChangedListener(new GenericTextWatcher(et_fuel_rs));
-
 
         b_new_transaction.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,6 +156,120 @@ public class NewTransaction extends AppCompatActivity {
         rl_back = findViewById(R.id.rl_back);
     }
 
+    private boolean getBundleData() {
+
+        boolean isCredit = false;
+
+        pump_code = getIntent().getStringExtra("pump_code");
+
+        Log.e("asd", "" + pump_code);
+
+        p_rate = Double.parseDouble(Objects.requireNonNull(sharedPrefs.getString("petrol_rate", "-1")));
+        d_rate = Double.parseDouble(Objects.requireNonNull(sharedPrefs.getString("diesel_rate", "-1")));
+
+        user_id = sharedPrefs.getInt("user_id", -1);
+        pump_id = sharedPrefs.getInt("pump_id", -1);
+        shift = sharedPrefs.getString("shift", "");
+
+        try {
+            JSONObject jsonObj = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("jsonObject")));
+            Log.e("jsonObj", jsonObj.toString());
+
+            // check if jsonObj keys exist
+            // evaluate if online/credit customer
+
+            // customer is online customer
+            if (jsonObj.has("cust_qr_code")) {
+                tv_car_no_plate.setVisibility(View.INVISIBLE);
+                tv_cust_name.setVisibility(View.INVISIBLE);
+
+                // auto set amounts and litres
+                String amount = jsonObj.getString("amount");
+                et_fuel_rs.setText(amount);
+                double doubleAmount = Double.parseDouble(amount);
+                double pre_litVal;
+                if (jsonObj.getString("fuel_type").equals("petrol")) {
+                    isPetrol = true;
+                    pre_litVal = doubleAmount / p_rate;
+                } else {
+                    isPetrol = false;
+                    pre_litVal = doubleAmount / d_rate;
+                }
+                double litVal = round(pre_litVal, 2);
+                et_fuel_litres.setText(String.valueOf(litVal));
+
+                // make edit texts uneditable
+                disableEditText(et_fuel_rs);
+                disableEditText(et_fuel_litres);
+
+                // init blank vars
+                car_id = 0;
+                cust_id = 0;
+                cust_name = "";
+                receipt_number = "";
+                car_no = "";
+
+                cust_type = jsonObj.getString("cust_type");
+                cust_qr = jsonObj.getString("cust_qr_code");
+
+            }
+            // customer is credit customer
+            else {
+
+                isCredit = true;
+
+                isPetrol = jsonObj.getBoolean("isPetrol");
+                car_id = jsonObj.getInt("car_id");
+                cust_id = jsonObj.getInt("cust_id");
+                cust_name = jsonObj.getString("cust_name");
+                receipt_number = jsonObj.getString("receipt_number");
+                car_no = jsonObj.getString("car_no");
+
+                cust_type = jsonObj.getString("cust_type");
+                cust_qr = jsonObj.getString("cust_qr_code");
+
+                tv_car_no_plate.setText(car_no);
+                tv_cust_name.setText(cust_name);
+                //Log.e("asd", "" + receipt_number);
+                //Log.e("tag", jsonObj.getString("cust_name"));
+
+                if (jsonObj.getBoolean("alert")) {
+                    tv_low_alert.setVisibility(View.VISIBLE);
+                    String alert = "Low Balance : " + jsonObj.getString("alert_value");
+                    tv_low_alert.setText(alert);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("errer", Objects.requireNonNull(e.getMessage()));
+        }
+
+        return isCredit;
+    }
+
+    private void setPetrolDieselUI() {
+        if (isPetrol) {
+            rl_back.setBackgroundColor(Color.parseColor("#0D9F56"));
+            fuel_rate.setText(String.valueOf(p_rate));
+
+        } else {
+            rl_back.setBackgroundColor(Color.parseColor("#00AAE8"));
+            fuel_type.setText("Diesel");
+            fuel_rate.setText(String.valueOf(d_rate));
+        }
+
+    }
+
+    private void setInputTextWatchers() {
+        et_fuel_litres.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(7, 2)});
+        et_fuel_rs.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(6, 2)});
+
+        // text change listener
+        et_fuel_litres.addTextChangedListener(new GenericTextWatcher(et_fuel_litres));
+        et_fuel_rs.addTextChangedListener(new GenericTextWatcher(et_fuel_rs));
+    }
+
     private void clickPhoto() {
         if (isWiFiEnabled) {
 
@@ -219,7 +281,7 @@ public class NewTransaction extends AppCompatActivity {
             try {
                 jsonObj.put("photo_type", "stop");
                 jsonObj.put("car_id", car_id);
-                jsonObj.put("pump_code", pump_code);
+                jsonObj.put("pump_qr_code", pump_code);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -295,8 +357,6 @@ public class NewTransaction extends AppCompatActivity {
     }
 
 
-
-
     private void newTransaction() {
 
         View view = this.getCurrentFocus();
@@ -315,8 +375,8 @@ public class NewTransaction extends AppCompatActivity {
             click = false;
         } else {
             try {
-                Double maxValueAmount = Double.valueOf(fuel_rs);
-                Double maxValueLit = Double.valueOf(fuel_lit);
+                double maxValueAmount = Double.parseDouble(fuel_rs);
+                double maxValueLit = Double.parseDouble(fuel_lit);
                 if ((maxValueAmount > 99999.99) || (maxValueLit > 999.99)) {
                     Snackbar.make(coordinatorLayout, "Amount has to be less than 99999.99 or lit less than 999.99", Snackbar.LENGTH_SHORT).show();
                     click = false;
@@ -328,8 +388,6 @@ public class NewTransaction extends AppCompatActivity {
                 Snackbar.make(coordinatorLayout, "Invalid Amount", Snackbar.LENGTH_SHORT).show();
                 click = false;
             }
-
-
         }
     }
 
@@ -354,16 +412,18 @@ public class NewTransaction extends AppCompatActivity {
                 jsonObj.put("cust_id", cust_id);
                 jsonObj.put("user_id", user_id);
                 jsonObj.put("receipt_no", receipt_number);
-                jsonObj.put("pump_code", pump_code);
+                jsonObj.put("pump_qr_code", pump_code);
                 jsonObj.put("shift", shift);
                 jsonObj.put("pump_id", pump_id);
+                jsonObj.put("cust_type", cust_type);
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.e("error", Objects.requireNonNull(e.getMessage()));
+                Log.e("error123", Objects.requireNonNull(e.getMessage()));
             }
 
             Log.e("Json Object", "obj" + jsonObj.toString());
+
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     url, jsonObj,
@@ -375,6 +435,12 @@ public class NewTransaction extends AppCompatActivity {
                             try {
                                 if (response.getBoolean("success")) {
                                     clickPhoto();
+
+                                    // update online to move pending to completed transactions
+                                    if (cust_type.equals("online")) {
+                                        updateOnlineCustomerTransStatus();
+                                    }
+
                                 } else {
                                     Log.e("result", "fail");
                                     Snackbar.make(coordinatorLayout, response.getString("msg"), Snackbar.LENGTH_SHORT).show();
@@ -412,7 +478,7 @@ public class NewTransaction extends AppCompatActivity {
             }) {
 
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json");
                     headers.put("charset", "utf-8");
@@ -420,7 +486,86 @@ public class NewTransaction extends AppCompatActivity {
                 }
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
+
+
         }
+    }
+
+
+    private void updateOnlineCustomerTransStatus() {
+
+//        Log.e("asdasd", "updateOnlineCustomerTransStatus");
+
+        JSONObject jsonObj = new JSONObject();
+        try {
+            jsonObj.put("qr", cust_qr);
+            jsonObj.put("liters", et_fuel_litres.getText().toString());
+
+            if ((isPetrol)) {
+                jsonObj.put("rate", p_rate);
+            } else {
+                jsonObj.put("rate", d_rate);
+            }
+            jsonObj.put("shift", shift);
+            jsonObj.put("attendant_id", user_id);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.e("postobj", jsonObj.toString());
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+                AppConstants.MOVE_PEND_TO_COMPLETED, jsonObj,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("updateOTStatus", response.toString());
+                        try {
+                            if (response.getBoolean("success")) {
+//                                clickPhoto();
+                            } else {
+                                Log.e("result", "fail");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        click = false;
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.statusCode == 409) {
+                    // HTTP Status Code: 409 Client error
+                    try {
+                        String jsonString = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
+                        JSONObject obj = new JSONObject(jsonString);
+                        String message = obj.getString("message");
+                        Log.e("NetworkResponse", message);
+                        Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
+                    } catch (UnsupportedEncodingException | JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Log.e("MOVE_PEND_TO_COMPLETED", error.toString());
+                click = false;
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("charset", "utf-8");
+                return headers;
+            }
+        };
+        MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
     }
 
     @Override
@@ -428,15 +573,14 @@ public class NewTransaction extends AppCompatActivity {
 //        super.onBackPressed();
     }
 
-//    private boolean isMyServiceRunning(Class<?> serviceClass) {
-//        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-//            if (serviceClass.getName().equals(service.service.getClassName())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    private void disableEditText(EditText editText) {
+        editText.setFocusable(false);
+        editText.setEnabled(false);
+        editText.setCursorVisible(false);
+        editText.setKeyListener(null);
+        editText.setBackgroundColor(Color.TRANSPARENT);
+    }
+
 
     private class GenericTextWatcher implements TextWatcher {
 
@@ -510,90 +654,4 @@ public class NewTransaction extends AppCompatActivity {
             }
         }
     }
-
-//    public void setKeysBasic(String key) {
-//        // [START crash_set_keys_basic]
-//        Crashlytics.setString(key, "foo" /* string value */);
-//
-//        Crashlytics.setBool(key, true /* boolean value */);
-//
-//        Crashlytics.setDouble(key, 1.0 /* double value */);
-//
-//        Crashlytics.setFloat(key, 1.0f /* float value */);
-//
-//        Crashlytics.setInt(key, 1 /* int value */);
-//        // [END crash_set_keys_basic]
-//    }
-//
-//    public void resetKey() {
-//        // [START crash_re_set_key]
-//        Crashlytics.setInt("current_level", 3);
-//        Crashlytics.setString("last_UI_action", "logged_in");
-//        // [END crash_re_set_key]
-//    }
-//
-//    public void logReportAndPrint() {
-//        // [START crash_log_report_and_print]
-//        Crashlytics.log(Log.DEBUG, "tag", "message");
-//        // [END crash_log_report_and_print]
-//    }
-//
-//    public void logReportOnly() {
-//        // [START crash_log_report_only]
-//        Crashlytics.log("message");
-//        // [END crash_log_report_only]
-//    }
-//
-//    public void enableAtRuntime() {
-//        // [START crash_enable_at_runtime]
-//        Fabric.with(this, new Crashlytics());
-//        // [END crash_enable_at_runtime]
-//    }
-//
-//    public void setUserId() {
-//        // [START crash_set_user_id]
-//        Crashlytics.setUserIdentifier("user123456789");
-//        // [END crash_set_user_id]
-//    }
-//
-//    public void methodThatThrows() throws Exception {
-//        throw new Exception();
-//    }
-//
-//    public void logCaughtEx() {
-//        // [START crash_log_caught_ex]
-//        try {
-//            methodThatThrows();
-//        } catch (Exception e) {
-//            Crashlytics.logException(e);
-//            // handle your exception here
-//        }
-//        // [END crash_log_caught_ex]
-//    }
-//
-//    public void enableDebugMode() {
-//        // [START crash_enable_debug_mode]
-//        final Fabric fabric = new Fabric.Builder(this)
-//                .kits(new Crashlytics())
-//                .debuggable(true)  // Enables Crashlytics debugger
-//                .build();
-//        Fabric.with(fabric);
-//        // [END crash_enable_debug_mode]
-//    }
-//
-//    public void forceACrash() {
-//        // [START crash_force_crash]
-//        Button crashButton = new Button(this);
-//        crashButton.setText("Crash!");
-//        crashButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View view) {
-//                Crashlytics.getInstance().crash(); // Force a crash
-//            }
-//        });
-//
-//        addContentView(crashButton, new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT));
-//        // [END crash_force_crash]
-//    }
 }

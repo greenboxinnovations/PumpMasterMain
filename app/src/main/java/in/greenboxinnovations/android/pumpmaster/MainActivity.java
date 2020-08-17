@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefs;
     private JSONObject jsonObject;
     private int car_id, receipt_number = 0;
-    private String pump_code;
+    private String pump_qr_code, cust_type, cust_qr_code;
     private static final int SCAN_CAR = 100;
     private static final int SCAN_PUMP = 101;
     private static final int ADD_CAR = 102;
@@ -91,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefs = getApplicationContext().getSharedPreferences(APP_SHARED_PREFS, Context.MODE_PRIVATE);
 
         car_id = 0;
-        pump_code = null;
+        pump_qr_code = null;
+        cust_type = "credit";
+        cust_qr_code = null;
 
         TextView petrol_rate = findViewById(R.id.tv_petrol_rate);
         TextView diesel_rate = findViewById(R.id.tv_diesel_rate);
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 assert barcode != null;
                 String val = barcode.displayValue;
                 Log.e("pump_qr_code", "" + val);
-                pump_code = val;
+                pump_qr_code = val;
                 if ((val.equals("8FuAVN303E")) || (val.equals("4xzliayQPL")) || (val.equals("asdfg12345")) || (val.equals("12345asdfg"))) {
                     snapZeroPhoto(val);
                 }
@@ -244,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 String amount = response.getString("amount");
                                 String fuel_type = response.getString("fuel_type");
+                                jsonObject.put("cust_qr_code", qr);
 
 
                                 final AlertDialog.Builder builder =
@@ -257,6 +260,11 @@ public class MainActivity extends AppCompatActivity {
                                                         if (vibe != null) {
                                                             vibe.vibrate(50);
                                                         }
+
+                                                        // customer is online type
+                                                        cust_type = "online";
+                                                        cust_qr_code = qr;
+
                                                         Intent scan = new Intent(getApplicationContext(), Scan.class);
                                                         scan.putExtra("title", "Scan Pump");
                                                         startActivityForResult(scan, SCAN_PUMP);
@@ -281,6 +289,10 @@ public class MainActivity extends AppCompatActivity {
                             String jsonString = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
                             JSONObject obj = new JSONObject(jsonString);
                             String message = obj.getString("message");
+
+                            // customer is credit type
+                            cust_type = "credit";
+
                             if (message.equals("QR Invalid")) {
                                 isCodeValid(qr);
                             }
@@ -489,7 +501,13 @@ public class MainActivity extends AppCompatActivity {
             try {
                 jsonObj.put("photo_type", "start");
                 jsonObj.put("car_id", car_id);
-                jsonObj.put("pump_code", pump_code);
+                jsonObj.put("pump_qr_code", pump_qr_code); // pump unit qr code
+
+                if (cust_type.equals("online")) {
+                    jsonObj.put("user_type", cust_type);
+                    jsonObj.put("user_qr_code", cust_qr_code);
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -522,6 +540,7 @@ public class MainActivity extends AppCompatActivity {
                                                             Intent i = new Intent(getApplicationContext(), NewTransaction.class);
                                                             try {
                                                                 jsonObject.put("receipt_number", receipt_number);
+                                                                jsonObject.put("cust_type", cust_type);
                                                             } catch (JSONException e) {
                                                                 e.printStackTrace();
                                                             }
