@@ -58,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int SCAN_CAR = 100;
     private static final int SCAN_PUMP = 101;
     private static final int ADD_CAR = 102;
+    private static final int CONFIRM_AMOUNT = 103;
+
+    private POJO_Transaction curTransPOJO = null;
 
 
     @Override
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    //online database check
+    // online database check
     private void isOnlineCustomer(final String qr) {
         if (isWiFiEnabled) {
 
@@ -242,35 +245,39 @@ public class MainActivity extends AppCompatActivity {
 
                                 jsonObject = response;
 
-                                // jsonObject comprises of all below items
+                                curTransPOJO = new POJO_Transaction();
+                                curTransPOJO.setCust_type("online");
+                                curTransPOJO.setAmount(Double.parseDouble(response.getString("amount")));
+                                curTransPOJO.setFuel_type(response.getString("fuel_type"));
+                                curTransPOJO.setCust_qr(qr);
 
-                                String amount = response.getString("amount");
-                                String fuel_type = response.getString("fuel_type");
-                                jsonObject.put("cust_qr_code", qr);
+                                Intent confirm_intent = new Intent(getApplicationContext(), CustomerConfirmTransaction.class);
+                                confirm_intent.putExtra("curTransPOJO", curTransPOJO);
+                                startActivityForResult(confirm_intent, CONFIRM_AMOUNT);
 
 
-                                final AlertDialog.Builder builder =
-                                        new AlertDialog.Builder(MainActivity.this).
-                                                setTitle(fuel_type).
-                                                setMessage(amount).
-                                                setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                                        if (vibe != null) {
-                                                            vibe.vibrate(50);
-                                                        }
-
-                                                        // customer is online type
-                                                        cust_type = "online";
-                                                        cust_qr_code = qr;
-
-                                                        Intent scan = new Intent(getApplicationContext(), Scan.class);
-                                                        scan.putExtra("title", "Scan Pump");
-                                                        startActivityForResult(scan, SCAN_PUMP);
-                                                    }
-                                                });
-                                builder.create().show();
+//                                final AlertDialog.Builder builder =
+//                                        new AlertDialog.Builder(MainActivity.this).
+//                                                setTitle(fuel_type).
+//                                                setMessage(amount).
+//                                                setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                                    @Override
+//                                                    public void onClick(DialogInterface dialog, int which) {
+//                                                        Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//                                                        if (vibe != null) {
+//                                                            vibe.vibrate(50);
+//                                                        }
+//
+//                                                        // customer is online type
+//                                                        cust_type = "online";
+//                                                        cust_qr_code = qr;
+//
+//                                                        Intent scan = new Intent(getApplicationContext(), Scan.class);
+//                                                        scan.putExtra("title", "Scan Pump");
+//                                                        startActivityForResult(scan, SCAN_PUMP);
+//                                                    }
+//                                                });
+//                                builder.create().show();
 
 
                             } catch (JSONException e) {
@@ -322,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //local network check
+    // local network check
     private void isCodeValid(final String val) {
         if (isWiFiEnabled) {
 
@@ -428,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (response.getBoolean("success")) {
                                     jsonObject = response;
                                     Log.e("json", jsonObject.toString());
-                                    receipt_number = Integer.valueOf(val);
+                                    receipt_number = Integer.parseInt(val);
 
                                     final String cust_name = jsonObject.getString("cust_name");
                                     final int cust_id = jsonObject.getInt("cust_id");

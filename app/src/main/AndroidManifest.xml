@@ -20,6 +20,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".CustomerConfirmTransaction"></activity>
+
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
