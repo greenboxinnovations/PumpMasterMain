@@ -3,7 +3,7 @@ package in.greenboxinnovations.android.pumpmaster;
 public interface AppConstants {
 
 //    String BASE_URL = "https://pay.greenboxinnovations.in";
-    String BASE_URL = "http://192.168.0.103/slim_test";
+    String BASE_URL = "http://192.168.0.100/fuelqr";
 
 
     String SCAN_CUST_QR = BASE_URL + "/pump_scan";

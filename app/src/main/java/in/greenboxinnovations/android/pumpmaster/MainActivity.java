@@ -171,6 +171,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(scan, SCAN_PUMP);
             }
         }
+
+        if (requestCode == CONFIRM_AMOUNT && resultCode == RESULT_OK) {
+            Log.e("CONFIRM_AMOUNT", "result found");
+
+            // cust confirmed, scan pump
+            Intent scan = new Intent(getApplicationContext(), Scan.class);
+            scan.putExtra("title", "Scan Pump");
+            startActivityForResult(scan, SCAN_PUMP);
+        }
     }
 
     // Ensure the right menu is setup
@@ -510,14 +519,22 @@ public class MainActivity extends AppCompatActivity {
                 jsonObj.put("car_id", car_id);
                 jsonObj.put("pump_qr_code", pump_qr_code); // pump unit qr code
 
-                if (cust_type.equals("online")) {
-                    jsonObj.put("user_type", cust_type);
-                    jsonObj.put("user_qr_code", cust_qr_code);
+//                if (cust_type.equals("online")) {
+//                    jsonObj.put("user_type", cust_type);
+//                    jsonObj.put("user_qr_code", cust_qr_code);
+//                }
+
+                if (curTransPOJO.getCust_type().equals("online")) {
+                    jsonObj.put("user_type", curTransPOJO.getCust_type());
+                    jsonObj.put("user_qr_code", curTransPOJO.getCust_qr());
                 }
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            Log.e("snap zero", jsonObj.toString());
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     url, jsonObj,
@@ -531,6 +548,8 @@ public class MainActivity extends AppCompatActivity {
                                     //get photo url as response and display here
                                     String photo_url = response.getString("photo_url");
                                     String url_photo = url1 + "/" + photo_url;
+
+
                                     ImageView image = new ImageView(MainActivity.this);
                                     Picasso.get().load(url_photo).into(image);
 
