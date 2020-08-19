@@ -3,6 +3,7 @@ package in.greenboxinnovations.android.pumpmaster;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -125,7 +126,7 @@ public class NewTransaction extends AppCompatActivity {
 
     private boolean getBundleData() {
 
-        curTransPOJO = (POJO_Transaction) getIntent().getSerializableExtra("curTransPOJO"); //Obtaining data
+        curTransPOJO = (POJO_Transaction) getIntent().getSerializableExtra("curTransPOJO"); // Obtain data
 
         boolean isCredit = false;
 
@@ -300,7 +301,16 @@ public class NewTransaction extends AppCompatActivity {
                                                             if (vibe != null) {
                                                                 vibe.vibrate(50);
                                                             }
-                                                            finish();
+
+                                                            // if qr type is trans qr, then show add online add car activity
+                                                            if (curTransPOJO.getCust_qr_type() == null) {
+                                                                Intent i = new Intent(getApplicationContext(), OnlineCustomerAddCar.class);
+                                                                i.putExtra("curTransPOJO", curTransPOJO);
+                                                                startActivity(i);
+                                                                finish();
+                                                            } else {
+                                                                finish();
+                                                            }
                                                         }
                                                     }).setCancelable(false).
 
