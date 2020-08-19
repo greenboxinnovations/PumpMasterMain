@@ -510,6 +510,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void snapZeroPhoto(final String val) {
         if (isWiFiEnabled) {
+
+            // set pump_qr
+            curTransPOJO.setPump_qr(val);
+
             final String url1 = getResources().getString(R.string.url_main);
             final String url = url1 + "/exe/snap_photo.php";
 
@@ -571,6 +575,7 @@ public class MainActivity extends AppCompatActivity {
                                                                 e.printStackTrace();
                                                             }
                                                             i.putExtra("jsonObject", jsonObject.toString());
+                                                            i.putExtra("curTransPOJO", curTransPOJO);
                                                             i.putExtra("pump_code", val);
                                                             receipt_number = 0;
                                                             startActivity(i);

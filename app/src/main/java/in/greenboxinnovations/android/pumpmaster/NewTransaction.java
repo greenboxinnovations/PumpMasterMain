@@ -61,47 +61,14 @@ public class NewTransaction extends AppCompatActivity {
     private boolean isWiFiEnabled, click = false;
     private SharedPreferences sharedPrefs;
 
+    private POJO_Transaction curTransPOJO;
+
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
         long factor = (long) Math.pow(10, places);
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
-    }
-
-//    public static Bitmap decodeSampledBitmapFromResource(File file, int reqWidth, int reqHeight) {
-//
-//        // First decode with inJustDecodeBounds=true to check dimensions
-//        final BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inJustDecodeBounds = true;
-//        BitmapFactory.decodeFile(file.getPath(), options);
-//
-//        // Calculate inSampleSize
-//        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-//
-//        // Decode bitmap with inSampleSize set
-//        options.inJustDecodeBounds = false;
-//        return BitmapFactory.decodeFile(file.getPath(), options);
-//    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-        return inSampleSize;
     }
 
 
@@ -158,6 +125,8 @@ public class NewTransaction extends AppCompatActivity {
 
     private boolean getBundleData() {
 
+        curTransPOJO = (POJO_Transaction) getIntent().getSerializableExtra("curTransPOJO"); //Obtaining data
+
         boolean isCredit = false;
 
         pump_code = getIntent().getStringExtra("pump_code");
@@ -171,24 +140,20 @@ public class NewTransaction extends AppCompatActivity {
         pump_id = sharedPrefs.getInt("pump_id", -1);
         shift = sharedPrefs.getString("shift", "");
 
-        try {
-            JSONObject jsonObj = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("jsonObject")));
-            Log.e("jsonObj", jsonObj.toString());
 
-            // check if jsonObj keys exist
-            // evaluate if online/credit customer
-
-            // customer is online customer
-            if (jsonObj.has("cust_qr_code")) {
+        if (curTransPOJO != null) {
+            // customer type is online
+            // fill in details
+            if (curTransPOJO.getCust_type().equals("online")) {
                 tv_car_no_plate.setVisibility(View.INVISIBLE);
                 tv_cust_name.setVisibility(View.INVISIBLE);
 
                 // auto set amounts and litres
-                String amount = jsonObj.getString("amount");
-                et_fuel_rs.setText(amount);
-                double doubleAmount = Double.parseDouble(amount);
+                double doubleAmount = curTransPOJO.getAmount();
                 double pre_litVal;
-                if (jsonObj.getString("fuel_type").equals("petrol")) {
+                et_fuel_rs.setText(String.valueOf(doubleAmount));
+
+                if (curTransPOJO.getFuel_type().equals("petrol")) {
                     isPetrol = true;
                     pre_litVal = doubleAmount / p_rate;
                 } else {
@@ -203,47 +168,63 @@ public class NewTransaction extends AppCompatActivity {
                 disableEditText(et_fuel_litres);
 
                 // init blank vars
-                car_id = 0;
-                cust_id = 0;
-                cust_name = "";
-                receipt_number = "";
-                car_no = "";
+//                car_id = 0;
+//                cust_id = 0;
+//                cust_name = "";
+//                receipt_number = "";
+//                car_no = "";
 
-                cust_type = jsonObj.getString("cust_type");
-                cust_qr = jsonObj.getString("cust_qr_code");
-
+                //cust_type = jsonObj.getString("cust_type");
+                //cust_qr = jsonObj.getString("cust_qr_code");
             }
-            // customer is credit customer
+            // customer is a credit customer
             else {
+                try {
+                    JSONObject jsonObj = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("jsonObject")));
+                    Log.e("jsonObj", jsonObj.toString());
 
-                isCredit = true;
+                    // check if jsonObj keys exist
+                    // evaluate if online/credit customer
 
-                isPetrol = jsonObj.getBoolean("isPetrol");
-                car_id = jsonObj.getInt("car_id");
-                cust_id = jsonObj.getInt("cust_id");
-                cust_name = jsonObj.getString("cust_name");
-                receipt_number = jsonObj.getString("receipt_number");
-                car_no = jsonObj.getString("car_no");
+                    // customer is online customer
+                    if (jsonObj.has("cust_qr_code")) {
 
-                cust_type = jsonObj.getString("cust_type");
-                cust_qr = jsonObj.getString("cust_qr_code");
 
-                tv_car_no_plate.setText(car_no);
-                tv_cust_name.setText(cust_name);
-                //Log.e("asd", "" + receipt_number);
-                //Log.e("tag", jsonObj.getString("cust_name"));
+                    }
+                    // customer is credit customer
+                    else {
 
-                if (jsonObj.getBoolean("alert")) {
-                    tv_low_alert.setVisibility(View.VISIBLE);
-                    String alert = "Low Balance : " + jsonObj.getString("alert_value");
-                    tv_low_alert.setText(alert);
+                        isCredit = true;
+
+                        isPetrol = jsonObj.getBoolean("isPetrol");
+                        car_id = jsonObj.getInt("car_id");
+                        cust_id = jsonObj.getInt("cust_id");
+                        cust_name = jsonObj.getString("cust_name");
+                        receipt_number = jsonObj.getString("receipt_number");
+                        car_no = jsonObj.getString("car_no");
+
+                        cust_type = jsonObj.getString("cust_type");
+                        cust_qr = jsonObj.getString("cust_qr_code");
+
+                        tv_car_no_plate.setText(car_no);
+                        tv_cust_name.setText(cust_name);
+                        //Log.e("asd", "" + receipt_number);
+                        //Log.e("tag", jsonObj.getString("cust_name"));
+
+                        if (jsonObj.getBoolean("alert")) {
+                            tv_low_alert.setVisibility(View.VISIBLE);
+                            String alert = "Low Balance : " + jsonObj.getString("alert_value");
+                            tv_low_alert.setText(alert);
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("errer", Objects.requireNonNull(e.getMessage()));
                 }
             }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("errer", Objects.requireNonNull(e.getMessage()));
         }
+
 
         return isCredit;
     }
@@ -277,6 +258,8 @@ public class NewTransaction extends AppCompatActivity {
 
             final String url = url1 + "/exe/snap_photo.php";
 
+            Log.e("new transaction url", url);
+
             JSONObject jsonObj = new JSONObject();
             try {
                 jsonObj.put("photo_type", "stop");
@@ -286,6 +269,8 @@ public class NewTransaction extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            Log.e("new-trans post", jsonObj.toString());
 
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                     url, jsonObj,
@@ -352,8 +337,6 @@ public class NewTransaction extends AppCompatActivity {
         } else {
             Snackbar.make(coordinatorLayout, "Please Enable Wifi", Snackbar.LENGTH_LONG).show();
         }
-
-
     }
 
 
@@ -400,22 +383,40 @@ public class NewTransaction extends AppCompatActivity {
 
             JSONObject jsonObj = new JSONObject();
             try {
-                jsonObj.put("isPetrol", isPetrol);
-                if (isPetrol) {
+//                jsonObj.put("isPetrol", isPetrol);
+//                if (isPetrol) {
+//                    jsonObj.put("fuel_rate", p_rate);
+//                } else {
+//                    jsonObj.put("fuel_rate", d_rate);
+//                }
+//                jsonObj.put("car_id", car_id);
+//                jsonObj.put("amount", fuel_rs);
+//                jsonObj.put("liters", fuel_lit);
+//                jsonObj.put("cust_id", cust_id);
+//                jsonObj.put("user_id", user_id);
+//                jsonObj.put("receipt_no", receipt_number);
+//                jsonObj.put("pump_qr_code", pump_code);
+//                jsonObj.put("shift", shift);
+//                jsonObj.put("pump_id", pump_id);
+//                jsonObj.put("cust_type", cust_type);
+
+//                jsonObj.put("isPetrol", isPetrol);
+                jsonObj.put("fuel_type", curTransPOJO.getFuel_type());
+                if (curTransPOJO.getFuel_type().equals("petrol")) {
                     jsonObj.put("fuel_rate", p_rate);
                 } else {
                     jsonObj.put("fuel_rate", d_rate);
                 }
-                jsonObj.put("car_id", car_id);
+                jsonObj.put("car_id", curTransPOJO.getCar_id());
                 jsonObj.put("amount", fuel_rs);
                 jsonObj.put("liters", fuel_lit);
-                jsonObj.put("cust_id", cust_id);
+                jsonObj.put("cust_id", curTransPOJO.getCust_id());
                 jsonObj.put("user_id", user_id);
-                jsonObj.put("receipt_no", receipt_number);
-                jsonObj.put("pump_qr_code", pump_code);
+                jsonObj.put("receipt_no", curTransPOJO.getReceipt_number());
+                jsonObj.put("pump_qr_code", curTransPOJO.getPump_qr());
                 jsonObj.put("shift", shift);
                 jsonObj.put("pump_id", pump_id);
-                jsonObj.put("cust_type", cust_type);
+                jsonObj.put("cust_type", curTransPOJO.getCust_type());
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -437,7 +438,10 @@ public class NewTransaction extends AppCompatActivity {
                                     clickPhoto();
 
                                     // update online to move pending to completed transactions
-                                    if (cust_type.equals("online")) {
+//                                    if (cust_type.equals("online")) {
+//                                        updateOnlineCustomerTransStatus();
+//                                    }
+                                    if (curTransPOJO.getCust_type().equals("online")) {
                                         updateOnlineCustomerTransStatus();
                                     }
 
@@ -486,22 +490,31 @@ public class NewTransaction extends AppCompatActivity {
                 }
             };
             MySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjReq);
-
-
         }
     }
 
 
     private void updateOnlineCustomerTransStatus() {
 
-//        Log.e("asdasd", "updateOnlineCustomerTransStatus");
+        Log.e("updateCustTrans", AppConstants.MOVE_PEND_TO_COMPLETED);
 
         JSONObject jsonObj = new JSONObject();
         try {
-            jsonObj.put("qr", cust_qr);
+//            jsonObj.put("qr", cust_qr);
+//            jsonObj.put("liters", et_fuel_litres.getText().toString());
+//
+//            if ((isPetrol)) {
+//                jsonObj.put("rate", p_rate);
+//            } else {
+//                jsonObj.put("rate", d_rate);
+//            }
+//            jsonObj.put("shift", shift);
+//            jsonObj.put("attendant_id", user_id);
+
+            jsonObj.put("qr", curTransPOJO.getCust_qr());
             jsonObj.put("liters", et_fuel_litres.getText().toString());
 
-            if ((isPetrol)) {
+            if ((curTransPOJO.getFuel_type().equals("petrol"))) {
                 jsonObj.put("rate", p_rate);
             } else {
                 jsonObj.put("rate", d_rate);
