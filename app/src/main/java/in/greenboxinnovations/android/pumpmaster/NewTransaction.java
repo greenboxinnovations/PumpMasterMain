@@ -303,14 +303,20 @@ public class NewTransaction extends AppCompatActivity {
                                                             }
 
                                                             // if qr type is trans qr, then show add online add car activity
-                                                            if (curTransPOJO.getCust_qr_type() == null) {
+                                                            if (curTransPOJO.hasCarQR()) {
+                                                                finish();
+                                                            } else {
                                                                 Intent i = new Intent(getApplicationContext(), OnlineCustomerAddCar.class);
                                                                 i.putExtra("curTransPOJO", curTransPOJO);
                                                                 startActivity(i);
                                                                 finish();
-                                                            } else {
-                                                                finish();
                                                             }
+
+//                                                            if (curTransPOJO.getCust_qr_type() == null) {
+//
+//                                                            } else {
+//                                                                finish();
+//                                                            }
                                                         }
                                                     }).setCancelable(false).
 

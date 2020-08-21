@@ -9,6 +9,16 @@ public class POJO_Transaction implements Serializable {
     private double amount, litres;
     private long scan_timestamp, transaction_duration;
 
+    public boolean hasCarQR() {
+        return hasCarQR;
+    }
+
+    public void setHasCarQR(boolean hasCarQR) {
+        this.hasCarQR = hasCarQR;
+    }
+
+    private boolean hasCarQR;
+
     public int getCust_id() {
         return cust_id;
     }

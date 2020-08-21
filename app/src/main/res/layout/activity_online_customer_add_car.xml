@@ -56,4 +56,29 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+
+    <RadioGroup
+        android:id="@+id/rg_car_fuel_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_online_cust_add_car_plate_no">
+
+        <RadioButton
+            android:id="@+id/rb_petrol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Petrol"
+            android:textSize="35sp" />
+
+        <RadioButton
+            android:id="@+id/rb_diesel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Diesel"
+            android:textSize="35sp" />
+    </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

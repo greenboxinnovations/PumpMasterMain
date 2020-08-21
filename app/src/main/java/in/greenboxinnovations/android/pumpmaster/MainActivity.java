@@ -258,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
                                 curTransPOJO.setCust_type("online");
                                 curTransPOJO.setAmount(Double.parseDouble(response.getString("amount")));
                                 curTransPOJO.setFuel_type(response.getString("fuel_type"));
+                                curTransPOJO.setHasCarQR(response.getBoolean("hasCarQR"));
                                 curTransPOJO.setCust_qr(qr);
 
                                 Intent confirm_intent = new Intent(getApplicationContext(), CustomerConfirmTransaction.class);
